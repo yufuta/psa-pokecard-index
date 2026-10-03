@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PSA ポケカ指数</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1a1d23;--sub:#667085;--line:#e4e7ec;--up:#0a8f4e;--down:#d92d20;--accent:#2f5bea;--raw:#c3cad6;--warn:#fff4d6;--warnink:#7a5200}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#181c24;--ink:#eceff4;--sub:#9aa4b2;--line:#2a303b;--up:#35c47c;--down:#ff6b5e;--accent:#7b9bff;--raw:#3b4452;--warn:#3a2f10;--warnink:#f5d98a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1218;--card:#181c24;--ink:#eceff4;--sub:#9aa4b2;--line:#2a303b;--up:#35c47c;--down:#ff6b5e;--accent:#7b9bff;--raw:#3b4452;--warn:#3a2f10;--warnink:#f5d98a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,"Hiragino Sans","Yu Gothic",sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding-block:6px;flex-wrap:wrap;gap:8px 12px}
+.logo{font-weight:700;font-size:17px;color:var(--ink)}
+nav{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px}
+nav a{color:var(--sub);font-size:14px}
+nav a.guide{color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 12px;font-weight:600}
+.panel{overflow-x:auto}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.steps>li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 52px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:700;display:grid;place-items:center;font-size:14px}
+.steps h3{margin:0 0 4px;font-size:16px}
+.note{background:var(--warn);color:var(--warnink);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:12px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+.banner{background:var(--warn);color:var(--warnink);font-size:13px;padding:6px 0;text-align:center}
+main{padding:20px 0 48px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 10px}
+.crumb{font-size:13px;color:var(--sub);margin-bottom:8px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.hero{display:flex;flex-wrap:wrap;gap:20px;align-items:baseline;margin-bottom:8px}
+.big{font-size:40px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.chg{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.down{color:var(--down)}
+.meta{font-size:12px;color:var(--sub)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.cat{display:block;color:var(--ink)}.cat:hover{text-decoration:none;border-color:var(--accent)}
+.cat .n{font-weight:600}
+.two{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media(max-width:720px){.two{grid-template-columns:1fr}.big{font-size:32px}nav a{font-size:13px}}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:12px;color:var(--sub);font-weight:600}
+td.r,th.r{text-align:right}
+.btn{display:inline-block;border:1px solid var(--accent);border-radius:8px;padding:2px 10px;font-size:13px}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:3px 12px;margin-right:6px;cursor:pointer;font-size:13px}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chartbox{position:relative}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:3px 8px;border-radius:6px;display:none;white-space:nowrap}
+footer{color:var(--sub);font-size:12px;padding:24px 0;border-top:1px solid var(--line)}
+.cta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+ul.plain{padding-left:20px;margin:6px 0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#/">PSA ポケカ指数 <span class="meta">JP × eBay</span></a>
+  <nav><a href="#/about">指数の算出方法</a><a class="guide" href="#/guide">日本からeBayで買い物できるの？</a></nav>
+</div></header>
+<div class="banner">PROTOTYPE — 表示データはすべて<strong>ダミー(乱数生成)</strong>です。カテゴリ・対象カードは仮置きです。</div>
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">
+  取引データの出典: eBay(正式版では eBay Marketplace Insights API を利用予定)。本サイトは eBay Inc. とは無関係の非公式サイトです。投資助言ではありません。
+</div></footer>
+
+<script>
+// ---------- 設定 ----------
+const JPY = 150;             // 仮の為替レート
+const DAYS = 120;
+const MIN_TRADES_7D = 3;     // ランキング対象の最小取引数
+const CATS = [
+  {id:'pokemon', name:'ポケモン', desc:'ポケモンが描かれたカード(ex・VMAX・GX・プロモ等)'},
+  {id:'support', name:'サポート', desc:'人物が描かれたサポートカード(SAR・SR等)'}
+];
+const CARDS = [{"id": "c001", "name": "メガリザードンXex [M2 110/080]", "nm": "メガリザードンXex", "num": "110/080", "box": "インフェルノX", "cat": "pokemon", "base": 66.0, "vol": 0.7, "en": "Mega Charizard X ex", "q": "PSA 10 Mega Charizard X ex 110/080"}, {"id": "c002", "name": "メガリザードンXex [M2 116/080]", "nm": "メガリザードンXex", "num": "116/080", "box": "インフェルノX", "cat": "pokemon", "base": 220.0, "vol": 0.5, "en": "Mega Charizard X ex", "q": "PSA 10 Mega Charizard X ex 116/080"}, {"id": "c003", "name": "ピカチュウ [020/M-P]", "nm": "ピカチュウ", "num": "020/M-P", "box": "M プロモーションカード", "cat": "pokemon", "base": 144.0, "vol": 1.1, "en": "Pikachu", "q": "PSA 10 Pikachu 020/M-P"}, {"id": "c004", "name": "リーリエの決心 [M1L 091/063]", "nm": "リーリエの決心", "num": "091/063", "box": "メガブレイブ", "cat": "support", "base": 25.0, "vol": 1.4, "en": "Lillie's Determination", "q": "PSA 10 Lillie's Determination 091/063"}, {"id": "c005", "name": "メガサーナイトex [M1S 087/063]", "nm": "メガサーナイトex", "num": "087/063", "box": "メガシンフォニア", "cat": "pokemon", "base": 23.0, "vol": 1.3, "en": "Mega Gardevoir ex", "q": "PSA 10 Mega Gardevoir ex 087/063"}, {"id": "c006", "name": "アセロラのいたずら [M1S 090/063]", "nm": "アセロラのいたずら", "num": "090/063", "box": "メガシンフォニア", "cat": "support", "base": 26.0, "vol": 0.6, "en": "Acerola's Mischief", "q": "PSA 10 Acerola's Mischief 090/063"}, {"id": "c007", "name": "ビクティニ [288/SV-P]", "nm": "ビクティニ", "num": "288/SV-P", "box": "SV プロモーションカード", "cat": "pokemon", "base": 95.0, "vol": 2.1, "en": "Victini", "q": "PSA 10 Victini 288/SV-P"}, {"id": "c008", "name": "ゼクロムex [sv11B 174/086]", "nm": "ゼクロムex", "num": "174/086", "box": "ブラックボルト", "cat": "pokemon", "base": 31.0, "vol": 0.8, "en": "Zekrom ex", "q": "PSA 10 Zekrom ex 174/086"}, {"id": "c009", "name": "リーリエのピッピex [sv9 126/100]", "nm": "リーリエのピッピex", "num": "126/100", "box": "バトルパートナーズ", "cat": "pokemon", "base": 201.0, "vol": 2.3, "en": "Lillie's Clefairy ex", "q": "PSA 10 Lillie's Clefairy ex 126/100"}, {"id": "c010", "name": "ブラッキーex [sv8a 217/187]", "nm": "ブラッキーex", "num": "217/187", "box": "テラスタルフェスex", "cat": "pokemon", "base": 167.0, "vol": 1.2, "en": "Umbreon ex", "q": "PSA 10 Umbreon ex 217/187"}, {"id": "c011", "name": "ニンフィアex [sv8a 212/187]", "nm": "ニンフィアex", "num": "212/187", "box": "テラスタルフェスex", "cat": "pokemon", "base": 728.0, "vol": 0.5, "en": "Sylveon ex", "q": "PSA 10 Sylveon ex 212/187"}, {"id": "c012", "name": "ピカチュウex [sv8 132/106]", "nm": "ピカチュウex", "num": "132/106", "box": "超電ブレイカー", "cat": "pokemon", "base": 472.0, "vol": 1.0, "en": "Pikachu ex", "q": "PSA 10 Pikachu ex 132/106"}, {"id": "c013", "name": "ルチアのアピール [SV7a 091/064]", "nm": "ルチアのアピール", "num": "091/064", "box": "楽園ドラゴーナ", "cat": "support", "base": 34.0, "vol": 0.6, "en": "Lisia's Appeal", "q": "PSA 10 Lisia's Appeal 091/064"}, {"id": "c014", "name": "ゼイユ [SV6 130/101]", "nm": "ゼイユ", "num": "130/101", "box": "変幻の仮面", "cat": "support", "base": 62.0, "vol": 2.0, "en": "Carmine", "q": "PSA 10 Carmine 130/101"}, {"id": "c015", "name": "リザードンex [SV4a 349/190]", "nm": "リザードンex", "num": "349/190", "box": "シャイニートレジャーex", "cat": "pokemon", "base": 39.0, "vol": 1.6, "en": "Charizard ex", "q": "PSA 10 Charizard ex 349/190"}, {"id": "c016", "name": "ミュウex [SV4a 347/190]", "nm": "ミュウex", "num": "347/190", "box": "シャイニートレジャーex", "cat": "pokemon", "base": 210.0, "vol": 1.1, "en": "Mew ex", "q": "PSA 10 Mew ex 347/190"}, {"id": "c017", "name": "ナンジャモ [SV4a 350/190]", "nm": "ナンジャモ", "num": "350/190", "box": "シャイニートレジャーex", "cat": "support", "base": 150.0, "vol": 0.5, "en": "Iono", "q": "PSA 10 Iono 350/190"}, {"id": "c018", "name": "サーナイトex [SV4a 348/190]", "nm": "サーナイトex", "num": "348/190", "box": "シャイニートレジャーex", "cat": "pokemon", "base": 25.0, "vol": 0.8, "en": "Gardevoir ex", "q": "PSA 10 Gardevoir ex 348/190"}, {"id": "c019", "name": "名探偵ピカチュウ [098/SV-P]", "nm": "名探偵ピカチュウ", "num": "098/SV-P", "box": "SV プロモーションカード", "cat": "pokemon", "base": 245.0, "vol": 1.3, "en": "Detective Pikachu", "q": "PSA 10 Detective Pikachu 098/SV-P"}, {"id": "c020", "name": "Pikachu with Grey Felt Hat [SVP EN 085]", "nm": "Pikachu with Grey Felt Hat", "num": "085", "box": "EN-SV Black Star Promo", "cat": "pokemon", "base": 63.0, "vol": 1.6, "en": "Pikachu with Grey Felt Hat", "q": "PSA 10 Pikachu with Grey Felt Hat 085"}, {"id": "c021", "name": "ピカチュウex [WCS23 001/030]", "nm": "ピカチュウex", "num": "001/030", "box": "WCS23横浜 記念デッキ", "cat": "pokemon", "base": 106.0, "vol": 1.0, "en": "Pikachu ex", "q": "PSA 10 Pikachu ex 001/030"}, {"id": "c022", "name": "リザードンex [SV3 134/108]", "nm": "リザードンex", "num": "134/108", "box": "黒炎の支配者", "cat": "pokemon", "base": 372.0, "vol": 1.8, "en": "Charizard ex", "q": "PSA 10 Charizard ex 134/108"}, {"id": "c023", "name": "リザードンex [SV2a 201/165]", "nm": "リザードンex", "num": "201/165", "box": "ポケモンカード151", "cat": "pokemon", "base": 49.0, "vol": 1.5, "en": "Charizard ex", "q": "PSA 10 Charizard ex 201/165"}, {"id": "c024", "name": "ミュウex [SV2a 205/165]", "nm": "ミュウex", "num": "205/165", "box": "ポケモンカード151", "cat": "pokemon", "base": 138.0, "vol": 2.2, "en": "Mew ex", "q": "PSA 10 Mew ex 205/165"}, {"id": "c025", "name": "ピカチュウ(マスターボールミラー) [SV2a 025/165]", "nm": "ピカチュウ(マスターボールミラー)", "num": "025/165", "box": "ポケモンカード151", "cat": "pokemon", "base": 293.0, "vol": 1.0, "en": "Pikachu Master Ball", "q": "PSA 10 Pikachu Master Ball 025/165"}, {"id": "c026", "name": "エリカの招待 [SV2a 206/165]", "nm": "エリカの招待", "num": "206/165", "box": "ポケモンカード151", "cat": "support", "base": 738.0, "vol": 0.6, "en": "Erika's Invitation", "q": "PSA 10 Erika's Invitation 206/165"}, {"id": "c027", "name": "ナンジャモ [SV2D 096/071]", "nm": "ナンジャモ", "num": "096/071", "box": "クレイバースト", "cat": "support", "base": 93.0, "vol": 1.9, "en": "Iono", "q": "PSA 10 Iono 096/071"}, {"id": "c028", "name": "ナンジャモ [SV2D 091/071]", "nm": "ナンジャモ", "num": "091/071", "box": "クレイバースト", "cat": "support", "base": 35.0, "vol": 1.4, "en": "Iono", "q": "PSA 10 Iono 091/071"}, {"id": "c029", "name": "ミライドン [048/SV-P]", "nm": "ミライドン", "num": "048/SV-P", "box": "SV プロモーションカード", "cat": "pokemon", "base": 23.0, "vol": 1.7, "en": "Miraidon", "q": "PSA 10 Miraidon 048/SV-P"}, {"id": "c030", "name": "ミモザ [SV1V 105/078]", "nm": "ミモザ", "num": "105/078", "box": "バイオレットex", "cat": "support", "base": 334.0, "vol": 1.5, "en": "Miriam", "q": "PSA 10 Miriam 105/078"}, {"id": "c031", "name": "ミモザ [SV1V 100/078]", "nm": "ミモザ", "num": "100/078", "box": "バイオレットex", "cat": "support", "base": 502.0, "vol": 1.0, "en": "Miriam", "q": "PSA 10 Miriam 100/078"}, {"id": "c032", "name": "カミツレのきらめき [S12a 246/172]", "nm": "カミツレのきらめき", "num": "246/172", "box": "VSTARユニバース", "cat": "support", "base": 259.0, "vol": 1.6, "en": "Elesa's Sparkle", "q": "PSA 10 Elesa's Sparkle 246/172"}, {"id": "c033", "name": "ギラティナVSTAR [S12a 261/172]", "nm": "ギラティナVSTAR", "num": "261/172", "box": "VSTARユニバース", "cat": "pokemon", "base": 169.0, "vol": 1.3, "en": "Giratina VSTAR", "q": "PSA 10 Giratina VSTAR 261/172"}, {"id": "c034", "name": "リザードンVSTAR [S12a 212/172]", "nm": "リザードンVSTAR", "num": "212/172", "box": "VSTARユニバース", "cat": "pokemon", "base": 441.0, "vol": 2.3, "en": "Charizard VSTAR", "q": "PSA 10 Charizard VSTAR 212/172"}, {"id": "c035", "name": "アルセウスVSTAR [S12a 262/172]", "nm": "アルセウスVSTAR", "num": "262/172", "box": "VSTARユニバース", "cat": "pokemon", "base": 114.0, "vol": 1.7, "en": "Arceus VSTAR", "q": "PSA 10 Arceus VSTAR 262/172"}, {"id": "c036", "name": "ミュウツーVSTAR [S12a 221/172]", "nm": "ミュウツーVSTAR", "num": "221/172", "box": "VSTARユニバース", "cat": "pokemon", "base": 25.0, "vol": 1.8, "en": "Mewtwo VSTAR", "q": "PSA 10 Mewtwo VSTAR 221/172"}, {"id": "c037", "name": "ピカチュウ [323/S-P]", "nm": "ピカチュウ", "num": "323/S-P", "box": "S プロモーションカード", "cat": "pokemon", "base": 216.0, "vol": 2.4, "en": "Pikachu", "q": "PSA 10 Pikachu 323/S-P"}, {"id": "c038", "name": "ピカチュウ [001/SV-P]", "nm": "ピカチュウ", "num": "001/SV-P", "box": "SV プロモーションカード", "cat": "pokemon", "base": 412.0, "vol": 1.0, "en": "Pikachu", "q": "PSA 10 Pikachu 001/SV-P"}, {"id": "c039", "name": "ルギアV [s12 110/098]", "nm": "ルギアV", "num": "110/098", "box": "パラダイムトリガー", "cat": "pokemon", "base": 83.0, "vol": 1.7, "en": "Lugia V", "q": "PSA 10 Lugia V 110/098"}, {"id": "c040", "name": "セレナ [S11A 081/068]", "nm": "セレナ", "num": "081/068", "box": "白熱のアルカナ", "cat": "support", "base": 22.0, "vol": 1.3, "en": "Serena", "q": "PSA 10 Serena 081/068"}, {"id": "c041", "name": "チルタリス [s11a 074/068]", "nm": "チルタリス", "num": "074/068", "box": "白熱のアルカナ", "cat": "pokemon", "base": 37.0, "vol": 0.6, "en": "Altaria", "q": "PSA 10 Altaria 074/068"}, {"id": "c042", "name": "ギラティナV [s11 111/100]", "nm": "ギラティナV", "num": "111/100", "box": "ロストアビス", "cat": "pokemon", "base": 25.0, "vol": 1.9, "en": "Giratina V", "q": "PSA 10 Giratina V 111/100"}, {"id": "c043", "name": "ピカチュウ [S10a 073/071]", "nm": "ピカチュウ", "num": "073/071", "box": "ダークファンタズマ", "cat": "pokemon", "base": 32.0, "vol": 0.9, "en": "Pikachu", "q": "PSA 10 Pikachu 073/071"}, {"id": "c044", "name": "カイ [S10P 077/067]", "nm": "カイ", "num": "077/067", "box": "スペースジャグラー", "cat": "support", "base": 84.0, "vol": 2.1, "en": "Irida", "q": "PSA 10 Irida 077/067"}, {"id": "c045", "name": "リザードンV [s9 103/100]", "nm": "リザードンV", "num": "103/100", "box": "スターバース", "cat": "pokemon", "base": 27.0, "vol": 1.3, "en": "Charizard V", "q": "PSA 10 Charizard V 103/100"}, {"id": "c046", "name": "マリィのプライド [SI 419/414]", "nm": "マリィのプライド", "num": "419/414", "box": "スタートデッキ100", "cat": "support", "base": 151.0, "vol": 2.2, "en": "Marnie's Pride", "q": "PSA 10 Marnie's Pride 419/414"}, {"id": "c047", "name": "アセロラの予感 [S8b 255/184]", "nm": "アセロラの予感", "num": "255/184", "box": "VMAXクライマックス", "cat": "support", "base": 408.0, "vol": 2.1, "en": "Acerola's Premonition", "q": "PSA 10 Acerola's Premonition 255/184"}, {"id": "c048", "name": "ユウリ [S8b 276/184]", "nm": "ユウリ", "num": "276/184", "box": "VMAXクライマックス", "cat": "support", "base": 56.0, "vol": 1.2, "en": "Gloria", "q": "PSA 10 Gloria 276/184"}, {"id": "c049", "name": "リザードン [S8a-P 001/025]", "nm": "リザードン", "num": "001/025", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 75.0, "vol": 2.2, "en": "Charizard", "q": "PSA 10 Charizard 001/025"}, {"id": "c050", "name": "ピカチュウV [s8a-G 001/015]", "nm": "ピカチュウV", "num": "001/015", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 680.0, "vol": 0.7, "en": "Pikachu V", "q": "PSA 10 Pikachu V 001/015"}, {"id": "c051", "name": "ブラッキー☆ [s8a-p 012/025]", "nm": "ブラッキー☆", "num": "012/025", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 38.0, "vol": 0.9, "en": "Umbreon Gold Star", "q": "PSA 10 Umbreon Gold Star 012/025"}, {"id": "c052", "name": "_のピカチュウ [S8a 007/025]", "nm": "_のピカチュウ", "num": "007/025", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 47.0, "vol": 1.4, "en": "_'s Pikachu", "q": "PSA 10 _'s Pikachu 007/025"}, {"id": "c053", "name": "ミュウ [S8a 030/028]", "nm": "ミュウ", "num": "030/028", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 175.0, "vol": 0.9, "en": "Mew", "q": "PSA 10 Mew 030/028"}, {"id": "c054", "name": "ひかるコイキング [S8a-P 010/025]", "nm": "ひかるコイキング", "num": "010/025", "box": "25th ANNIVERSARY COLLECTION", "cat": "pokemon", "base": 20.0, "vol": 1.2, "en": "Shining Magikarp", "q": "PSA 10 Shining Magikarp 010/025"}, {"id": "c055", "name": "ミュウVMAX [s8 119/100]", "nm": "ミュウVMAX", "num": "119/100", "box": "フュージョンアーツ", "cat": "pokemon", "base": 78.0, "vol": 1.5, "en": "Mew VMAX", "q": "PSA 10 Mew VMAX 119/100"}, {"id": "c056", "name": "ピカチュウ [227/S-P]", "nm": "ピカチュウ", "num": "227/S-P", "box": "S プロモーションカード", "cat": "pokemon", "base": 668.0, "vol": 1.8, "en": "Pikachu", "q": "PSA 10 Pikachu 227/S-P"}, {"id": "c057", "name": "レックウザVMAX [S7R 083/067]", "nm": "レックウザVMAX", "num": "083/067", "box": "蒼空ストリーム", "cat": "pokemon", "base": 133.0, "vol": 1.6, "en": "Rayquaza VMAX", "q": "PSA 10 Rayquaza VMAX 083/067"}, {"id": "c058", "name": "レックウザV [S7R 076/067]", "nm": "レックウザV", "num": "076/067", "box": "蒼空ストリーム", "cat": "pokemon", "base": 241.0, "vol": 0.5, "en": "Rayquaza V", "q": "PSA 10 Rayquaza V 076/067"}, {"id": "c059", "name": "ブラッキーVMAX [S6a 095/069]", "nm": "ブラッキーVMAX", "num": "095/069", "box": "イーブイヒーローズ", "cat": "pokemon", "base": 549.0, "vol": 2.0, "en": "Umbreon VMAX", "q": "PSA 10 Umbreon VMAX 095/069"}, {"id": "c060", "name": "ブラッキーV [S6a 085/069]", "nm": "ブラッキーV", "num": "085/069", "box": "イーブイヒーローズ", "cat": "pokemon", "base": 500.0, "vol": 2.0, "en": "Umbreon V", "q": "PSA 10 Umbreon V 085/069"}, {"id": "c061", "name": "ニンフィアVMAX [S6a 093/069]", "nm": "ニンフィアVMAX", "num": "093/069", "box": "イーブイヒーローズ", "cat": "pokemon", "base": 85.0, "vol": 1.2, "en": "Sylveon VMAX", "q": "PSA 10 Sylveon VMAX 093/069"}, {"id": "c062", "name": "エーフィVMAX [189/S-P]", "nm": "エーフィVMAX", "num": "189/S-P", "box": "S プロモーションカード", "cat": "pokemon", "base": 29.0, "vol": 1.7, "en": "Espeon VMAX", "q": "PSA 10 Espeon VMAX 189/S-P"}, {"id": "c063", "name": "グレイシアVMAX [S6a 091/069]", "nm": "グレイシアVMAX", "num": "091/069", "box": "イーブイヒーローズ", "cat": "pokemon", "base": 25.0, "vol": 0.5, "en": "Glaceon VMAX", "q": "PSA 10 Glaceon VMAX 091/069"}, {"id": "c064", "name": "ゲンガーVMAX [SGG 020/019]", "nm": "ゲンガーVMAX", "num": "020/019", "box": "ハイクラスデッキ「ゲンガーVMAX」", "cat": "pokemon", "base": 43.0, "vol": 0.7, "en": "Gengar VMAX", "q": "PSA 10 Gengar VMAX 020/019"}, {"id": "c065", "name": "マリィ [S4a 198/190]", "nm": "マリィ", "num": "198/190", "box": "シャイニースターV", "cat": "support", "base": 70.0, "vol": 0.5, "en": "Marnie", "q": "PSA 10 Marnie 198/190"}, {"id": "c066", "name": "リザードンVMAX [S4a 308/190]", "nm": "リザードンVMAX", "num": "308/190", "box": "シャイニースターV", "cat": "pokemon", "base": 20.0, "vol": 0.7, "en": "Charizard VMAX", "q": "PSA 10 Charizard VMAX 308/190"}, {"id": "c067", "name": "アローラの仲間たち [401/SM-P]", "nm": "アローラの仲間たち", "num": "401/SM-P", "box": "SM プロモーションカード", "cat": "support", "base": 29.0, "vol": 1.1, "en": "Alola Friends", "q": "PSA 10 Alola Friends 401/SM-P"}, {"id": "c068", "name": "マリィ [S1H 068/060]", "nm": "マリィ", "num": "068/060", "box": "シールド", "cat": "support", "base": 22.0, "vol": 2.1, "en": "Marnie", "q": "PSA 10 Marnie 068/060"}, {"id": "c069", "name": "ピカチュウ [001/S-P]", "nm": "ピカチュウ", "num": "001/S-P", "box": "S プロモーションカード", "cat": "pokemon", "base": 192.0, "vol": 0.7, "en": "Pikachu", "q": "PSA 10 Pikachu 001/S-P"}, {"id": "c070", "name": "かんこうきゃく [SM12a 192/173]", "nm": "かんこうきゃく", "num": "192/173", "box": "TAG TEAM GX タッグオールスターズ", "cat": "support", "base": 51.0, "vol": 1.1, "en": "Sightseer", "q": "PSA 10 Sightseer 192/173"}, {"id": "c071", "name": "リーリエ [397/SM-P]", "nm": "リーリエ", "num": "397/SM-P", "box": "SM プロモーションカード", "cat": "support", "base": 76.0, "vol": 0.6, "en": "Lillie", "q": "PSA 10 Lillie 397/SM-P"}, {"id": "c072", "name": "エリカのおもてなし [SM12a 190/173]", "nm": "エリカのおもてなし", "num": "190/173", "box": "TAG TEAM GX タッグオールスターズ", "cat": "support", "base": 455.0, "vol": 2.4, "en": "Erika's Hospitality", "q": "PSA 10 Erika's Hospitality 190/173"}, {"id": "c073", "name": "ブラッキー&ダークライGX [SM12a 182/173]", "nm": "ブラッキー&ダークライGX", "num": "182/173", "box": "TAG TEAM GX タッグオールスターズ", "cat": "pokemon", "base": 111.0, "vol": 1.4, "en": "Umbreon & Darkrai GX", "q": "PSA 10 Umbreon & Darkrai GX 182/173"}, {"id": "c074", "name": "リーリエの全力 [SM11b 068/049]", "nm": "リーリエの全力", "num": "068/049", "box": "ドリームリーグ", "cat": "support", "base": 27.0, "vol": 0.6, "en": "Lillie's Full Force", "q": "PSA 10 Lillie's Full Force 068/049"}, {"id": "c075", "name": "ピッピ [381/S-P]", "nm": "ピッピ", "num": "381/S-P", "box": "SM プロモーションカード", "cat": "pokemon", "base": 71.0, "vol": 0.9, "en": "Clefairy", "q": "PSA 10 Clefairy 381/S-P"}, {"id": "c076", "name": "ソルガレオ&ルナアーラGX [SM11b 063/049]", "nm": "ソルガレオ&ルナアーラGX", "num": "063/049", "box": "ドリームリーグ", "cat": "pokemon", "base": 423.0, "vol": 0.7, "en": "Solgaleo & Lunala GX", "q": "PSA 10 Solgaleo & Lunala GX 063/049"}, {"id": "c077", "name": "メイ [SM11b 067/049]", "nm": "メイ", "num": "067/049", "box": "ドリームリーグ", "cat": "support", "base": 22.0, "vol": 2.3, "en": "Rosa", "q": "PSA 10 Rosa 067/049"}, {"id": "c078", "name": "レシラム&ゼクロムGX [SM11b 064/049]", "nm": "レシラム&ゼクロムGX", "num": "064/049", "box": "ドリームリーグ", "cat": "pokemon", "base": 140.0, "vol": 0.7, "en": "Reshiram & Zekrom GX", "q": "PSA 10 Reshiram & Zekrom GX 064/049"}, {"id": "c079", "name": "ミュウツー&ミュウGX [SM11 098/094]", "nm": "ミュウツー&ミュウGX", "num": "098/094", "box": "ミラクルツイン", "cat": "pokemon", "base": 148.0, "vol": 0.5, "en": "Mewtwo & Mew GX", "q": "PSA 10 Mewtwo & Mew GX 098/094"}, {"id": "c080", "name": "ムサシとコジロウ [SM10b 062/054]", "nm": "ムサシとコジロウ", "num": "062/054", "box": "スカイレジェンド", "cat": "support", "base": 140.0, "vol": 2.4, "en": "Jessie & James", "q": "PSA 10 Jessie & James 062/054"}, {"id": "c081", "name": "ファイヤー&サンダー&フリーザーGX [SM10b 060/054]", "nm": "ファイヤー&サンダー&フリーザーGX", "num": "060/054", "box": "スカイレジェンド", "cat": "pokemon", "base": 480.0, "vol": 1.8, "en": "Moltres & Zapdos & Articuno GX", "q": "PSA 10 Moltres & Zapdos & Articuno GX 060/054"}, {"id": "c082", "name": "レシラム&リザードンGX [SM10 097/095]", "nm": "レシラム&リザードンGX", "num": "097/095", "box": "ダブルブレイズ", "cat": "pokemon", "base": 52.0, "vol": 1.1, "en": "Reshiram & Charizard GX", "q": "PSA 10 Reshiram & Charizard GX 097/095"}, {"id": "c083", "name": "サーナイト&ニンフィアGX [SM9a 061/055]", "nm": "サーナイト&ニンフィアGX", "num": "061/055", "box": "ナイトユニゾン", "cat": "pokemon", "base": 37.0, "vol": 1.9, "en": "Gardevoir & Sylveon GX", "q": "PSA 10 Gardevoir & Sylveon GX 061/055"}, {"id": "c084", "name": "ピカチュウ [288/SM-P]", "nm": "ピカチュウ", "num": "288/SM-P", "box": "SM プロモーションカード", "cat": "pokemon", "base": 142.0, "vol": 2.0, "en": "Pikachu", "q": "PSA 10 Pikachu 288/SM-P"}, {"id": "c085", "name": "レッドのピカチュウ [270/SM-P]", "nm": "レッドのピカチュウ", "num": "270/SM-P", "box": "SM プロモーションカード", "cat": "pokemon", "base": 67.0, "vol": 0.8, "en": "Red's Pikachu", "q": "PSA 10 Red's Pikachu 270/SM-P"}, {"id": "c086", "name": "ピカチュウ&ゼクロムGX [SM9 101/095]", "nm": "ピカチュウ&ゼクロムGX", "num": "101/095", "box": "タッグボルト", "cat": "pokemon", "base": 397.0, "vol": 2.4, "en": "Pikachu & Zekrom GX", "q": "PSA 10 Pikachu & Zekrom GX 101/095"}, {"id": "c087", "name": "ラティアス&ラティオスGX [SM9 105/095]", "nm": "ラティアス&ラティオスGX", "num": "105/095", "box": "タッグボルト", "cat": "pokemon", "base": 462.0, "vol": 2.0, "en": "Latias & Latios GX", "q": "PSA 10 Latias & Latios GX 105/095"}, {"id": "c088", "name": "ゲンガー&ミミッキュGX [SM9 103/095]", "nm": "ゲンガー&ミミッキュGX", "num": "103/095", "box": "タッグボルト", "cat": "pokemon", "base": 407.0, "vol": 1.9, "en": "Gengar & Mimikyu GX", "q": "PSA 10 Gengar & Mimikyu GX 103/095"}, {"id": "c089", "name": "エリカのおもてなし [SM9 107/095]", "nm": "エリカのおもてなし", "num": "107/095", "box": "タッグボルト", "cat": "support", "base": 46.0, "vol": 1.4, "en": "Erika's Hospitality", "q": "PSA 10 Erika's Hospitality 107/095"}, {"id": "c090", "name": "リザードンGX [SM8b 209/150]", "nm": "リザードンGX", "num": "209/150", "box": "GXウルトラシャイニー", "cat": "pokemon", "base": 74.0, "vol": 0.5, "en": "Charizard GX", "q": "PSA 10 Charizard GX 209/150"}, {"id": "c091", "name": "シロナ [SM8b 153/150]", "nm": "シロナ", "num": "153/150", "box": "GXウルトラシャイニー", "cat": "support", "base": 22.0, "vol": 1.0, "en": "Cynthia", "q": "PSA 10 Cynthia 153/150"}, {"id": "c092", "name": "ルチア [SM7 104/096]", "nm": "ルチア", "num": "104/096", "box": "裂空のカリスマ", "cat": "support", "base": 52.0, "vol": 1.8, "en": "Lisia", "q": "PSA 10 Lisia 104/096"}, {"id": "c093", "name": "シロナ [SM5M 070/066]", "nm": "シロナ", "num": "070/066", "box": "ウルトラムーン", "cat": "support", "base": 677.0, "vol": 1.3, "en": "Cynthia", "q": "PSA 10 Cynthia 070/066"}, {"id": "c094", "name": "リーリエ [SM4+ 119/114]", "nm": "リーリエ", "num": "119/114", "box": "GXバトルブースト", "cat": "support", "base": 630.0, "vol": 2.4, "en": "Lillie", "q": "PSA 10 Lillie 119/114"}, {"id": "c095", "name": "ルザミーネ [SM4A 055/050]", "nm": "ルザミーネ", "num": "055/050", "box": "超次元の暴獣", "cat": "support", "base": 673.0, "vol": 1.1, "en": "Lusamine", "q": "PSA 10 Lusamine 055/050"}, {"id": "c096", "name": "リーリエ [SM1M 066/060]", "nm": "リーリエ", "num": "066/060", "box": "コレクションムーン", "cat": "support", "base": 45.0, "vol": 0.9, "en": "Lillie", "q": "PSA 10 Lillie 066/060"}, {"id": "c097", "name": "マリオピカチュウ [294/XY-P]", "nm": "マリオピカチュウ", "num": "294/XY-P", "box": "XY プロモーションカード", "cat": "pokemon", "base": 41.0, "vol": 0.8, "en": "Mario Pikachu", "q": "PSA 10 Mario Pikachu 294/XY-P"}, {"id": "c098", "name": "ピカチュウEX [CP6 094/087]", "nm": "ピカチュウEX", "num": "094/087", "box": "20th Anniversary", "cat": "pokemon", "base": 199.0, "vol": 2.2, "en": "Pikachu EX", "q": "PSA 10 Pikachu EX 094/087"}, {"id": "c099", "name": "ピカチュウ [CP3 010/032]", "nm": "ピカチュウ", "num": "010/032", "box": "ポケキュンコレクション", "cat": "pokemon", "base": 441.0, "vol": 1.4, "en": "Pikachu", "q": "PSA 10 Pikachu 010/032"}, {"id": "c100", "name": "ニンフィアEX(エラー版) [CP3 026/032]", "nm": "ニンフィアEX(エラー版)", "num": "026/032", "box": "ポケキュンコレクション", "cat": "pokemon", "base": 221.0, "vol": 2.0, "en": "Sylveon EX Error", "q": "PSA 10 Sylveon EX Error 026/032"}];
+
+// ---------- ダミーデータ生成(シード固定) ----------
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){return Math.sqrt(-2*Math.log(r()||1e-9))*Math.cos(2*Math.PI*r())}
+const R = rng(20261003);
+const dates = [];
+{const end=new Date();end.setHours(0,0,0,0);for(let i=DAYS-1;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);dates.push(d)}}
+const fmtDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const catWalk = {};
+CATS.forEach(c=>{let x=0;catWalk[c.id]=dates.map((_,i)=>(x+=gauss(R)*0.012+(c.id==='151'?0.0015:0.0005)))});
+CARDS.forEach(c=>{
+  let w=0;c.trades=[];
+  dates.forEach((d,i)=>{
+    w+=gauss(R)*0.008;
+    const n=Math.max(0,Math.round(c.vol+gauss(R)*1.2));
+    for(let k=0;k<n;k++){
+      let p=c.base*Math.exp(catWalk[c.cat][i]+w+gauss(R)*0.06);
+      if(R()<0.03)p*=R()<0.5?1.6:0.6;            // 外れ値
+      c.trades.push({di:i,date:fmtDate(d),usd:Math.round(p*100)/100});
+    }
+  });
+});
+
+// ---------- 指数計算 ----------
+const median = a => {const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+function robustMedian(a){
+  const m=median(a),mad=median(a.map(x=>Math.abs(x-m)))*1.4826;
+  const kept=mad>0?a.filter(x=>Math.abs(x-m)<=3*mad):a;
+  return median(kept.length?kept:a);
+}
+CARDS.forEach(c=>{
+  c.price=[];c.n7=[];let last=c.base;
+  for(let i=0;i<DAYS;i++){
+    const w=c.trades.filter(t=>t.di>i-7&&t.di<=i);
+    c.n7.push(w.length);
+    if(w.length>=2)last=robustMedian(w.map(t=>t.usd));else if(w.length===1)last=w[0].usd;
+    c.price.push(last);
+  }
+});
+const ema=(a,al=0.5)=>{const o=[a[0]];for(let i=1;i<a.length;i++)o.push(al*a[i]+(1-al)*o[i-1]);return o};
+function geoIndex(cards){ // 等ウェイト幾何平均(Jevons型)
+  return dates.map((_,i)=>100*Math.exp(cards.reduce((s,c)=>s+Math.log(c.price[i]/c.price[0]),0)/cards.length));
+}
+function laspeyres(cards){ // 基準日価格ウェイト
+  const tot=cards.reduce((s,c)=>s+c.price[0],0);
+  return dates.map((_,i)=>100*cards.reduce((s,c)=>s+c.price[0]*(c.price[i]/c.price[0]),0)/tot);
+}
+CARDS.forEach(c=>{c.idxRaw=c.price.map(p=>100*p/c.price[0]);c.idx=ema(c.idxRaw)});
+CATS.forEach(c=>{c.cards=CARDS.filter(x=>x.cat===c.id);c.raw=geoIndex(c.cards);c.idx=ema(c.raw)});
+const ALL={raw:laspeyres(CARDS)};ALL.idx=ema(ALL.raw);
+
+// ---------- ユーティリティ ----------
+const last = a => a[a.length-1];
+const pct = (a,i=a.length-1) => (a[i]/a[i-1]-1)*100;
+const fmtPct = v => `${v>=0?'+':''}${v.toFixed(2)}%`;
+const cls = v => v>=0?'up':'down';
+const usd = v => '$'+v.toLocaleString('en-US',{maximumFractionDigits:2});
+const jpy = v => '¥'+Math.round(v*JPY).toLocaleString('ja-JP');
+const ebayUrl = c => 'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(c.q)+'&LH_Sold=1&LH_Complete=1';
+
+function chart({series,labels,fmt=v=>v.toFixed(2)}){ // series:[{data,color,w}]
+  const W=720,H=240,P={l:44,r:10,t:10,b:22};
+  const all=series.flatMap(s=>s.data),mn=Math.min(...all),mx=Math.max(...all),pad=(mx-mn)*0.08||1;
+  const lo=mn-pad,hi=mx+pad,n=series[0].data.length;
+  const X=i=>P.l+(W-P.l-P.r)*i/(n-1),Y=v=>P.t+(H-P.t-P.b)*(1-(v-lo)/(hi-lo));
+  let g='';
+  for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--sub)">${fmt(v)}</text>`}
+  [0,.25,.5,.75,1].forEach(f=>{const i=Math.round((n-1)*f);g+=`<text x="${X(i)}" y="${H-5}" text-anchor="${f===0?'start':f===1?'end':'middle'}" font-size="11" fill="var(--sub)">${labels[i].slice(5)}</text>`});
+  const lines=series.map(s=>`<polyline fill="none" stroke="${s.color}" stroke-width="${s.w||2}" stroke-linejoin="round" points="${s.data.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/>`).join('');
+  const id='c'+Math.random().toString(36).slice(2,8);
+  setTimeout(()=>{const el=document.getElementById(id);if(!el)return;const svg=el.querySelector('svg'),tip=el.querySelector('.tip');
+    svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W;const i=Math.max(0,Math.min(n-1,Math.round((x-P.l)/(W-P.l-P.r)*(n-1))));const s=series[series.length-1];
+      tip.style.display='block';tip.style.left=(X(i)/W*r.width+8)+'px';tip.style.top='6px';tip.textContent=`${labels[i]}  ${fmt(s.data[i])}`});
+    svg.addEventListener('mouseleave',()=>tip.style.display='none')},0);
+  return `<div class="chartbox" id="${id}"><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="推移グラフ">${g}${lines}</svg><div class="tip"></div></div>`;
+}
+function spark(data,w=120,h=32){
+  const mn=Math.min(...data),mx=Math.max(...data),X=i=>w*i/(data.length-1),Y=v=>h-2-(h-4)*(v-mn)/((mx-mn)||1);
+  const c=last(data)>=data[0]?'var(--up)':'var(--down)';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${c}" stroke-width="1.6" points="${data.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/></svg>`;
+}
+function rangeTabs(key){return `<div class="tabs" style="margin:6px 0 8px">${[30,90,120].map(d=>`<button data-r="${d}" class="${state.range===d?'on':''}">${d}日</button>`).join('')}</div>`}
+const state={range:90};
+function slice(a){return a.slice(-state.range)}
+function sliceL(){return dates.map(fmtDate).slice(-state.range)}
+function rebase(a){const s=slice(a);return s.map(v=>v/s[0]*100)}
+
+function indexBlock(title,obj,note){
+  const v=last(obj.idx),ch=pct(obj.idx);
+  return `<div class="panel">
+    <div class="hero"><div><div class="meta">${title}</div><div class="big">${v.toFixed(2)}</div></div>
+      <div><div class="meta">前日比</div><div class="chg ${cls(ch)}">${fmtPct(ch)}</div></div>
+      <div><div class="meta">7日前比</div><div class="chg ${cls(v/obj.idx[obj.idx.length-8]-1)}">${fmtPct((v/obj.idx[obj.idx.length-8]-1)*100)}</div></div></div>
+    <div class="meta">${note||''}</div>
+    ${rangeTabs()}
+    ${chart({series:[{data:rebase(obj.raw),color:'var(--raw)',w:1.2},{data:rebase(obj.idx),color:'var(--accent)',w:2.4}],labels:sliceL()})}
+    <div class="meta"><span style="color:var(--accent)">━</span> 公表値(平滑化後) <span style="color:var(--raw)">━</span> 平滑化前 ・ 基準日 = 100(表示期間の初日に再基準化)</div>
+  </div>`;
+}
+function rankTable(rows){
+  return `<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(c=>{const ch=pct(c.idx);
+    return `<tr><td><a href="#/card/${c.id}">${c.name}</a></td><td class="r">${usd(last(c.price))}</td><td class="r ${cls(ch)}">${fmtPct(ch)}</td></tr>`}).join('')}</tbody></table>`;
+}
+function cardTable(cards){
+  return `<table><thead><tr><th>カード</th><th class="r">PSA10相場</th><th class="r">前日比</th><th class="r">推移</th></tr></thead><tbody>${cards.map(c=>{const ch=pct(c.idx);
+    return `<tr><td><a href="#/card/${c.id}">${c.name}</a></td><td class="r">${usd(last(c.price))} <span class="meta">(${jpy(last(c.price))})</span></td><td class="r ${cls(ch)}">${fmtPct(ch)}</td><td class="r">${spark(c.idx.slice(-30),90,24)}</td></tr>`}).join('')}</tbody></table>`;
+}
+
+// ---------- ページ ----------
+function pageTop(){
+  const elig=CARDS.filter(c=>last(c.n7)>=MIN_TRADES_7D);
+  const sorted=[...elig].sort((a,b)=>pct(b.idx)-pct(a.idx));
+  return `<h1>ポケモンカード(日本語版)PSA10 eBay 取引価格指数</h1>
+  <div class="meta" style="margin-bottom:12px">更新: ${fmtDate(last(dates))} ／ eBay 落札価格ベース ／ 対象 ${CARDS.length} 銘柄</div>
+  ${indexBlock('総合指数',ALL,'基準日価格ウェイトの総合指数。直近7日の落札価格の中央値を元に算出し、EMAで平滑化。')}
+  <h2>カテゴリ</h2>
+  <div class="grid">${CATS.map(c=>{const ch=pct(c.idx);return `<a class="panel cat" href="#/category/${c.id}">
+    <div class="n">${c.name}</div><div class="meta">${c.desc}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><div><span style="font-size:22px;font-weight:700">${last(c.idx).toFixed(2)}</span> <span class="${cls(ch)}">${fmtPct(ch)}</span></div>${spark(c.idx.slice(-30))}</div></a>`}).join('')}</div>
+  <div class="two"><div><h2>前日から上がったカード TOP10</h2><div class="panel">${rankTable(sorted.slice(0,10))}</div></div>
+  <div><h2>前日から下がったカード TOP10</h2><div class="panel">${rankTable(sorted.slice(-10).reverse())}</div></div></div>
+  <div class="meta" style="margin-top:6px">※ ランキングは直近7日の取引が${MIN_TRADES_7D}件以上のカードのみ対象(少数取引による乱高下を除外)。</div>
+  ${ebayCta()}`;
+}
+function ebayCta(){return `<h2>eBay で実際の取引を確認する</h2><div class="panel cta"><div>本サイトの指数は eBay の実取引価格が元になっています。各カードのページから、eBay の落札・出品ページへ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="https://www.ebay.com/" target="_blank" rel="noopener">eBay を開く ↗</a></div></div>`}
+function pageCat(id){
+  const c=CATS.find(x=>x.id===id);if(!c)return '<p>not found</p>';
+  return `<div class="crumb"><a href="#/">TOP</a> › カテゴリ</div><h1>${c.name}</h1><div class="meta" style="margin-bottom:12px">${c.desc} ／ ${c.cards.length} 銘柄</div>
+  ${indexBlock('カテゴリ指数',c,'等ウェイト幾何平均。高額カードに引っ張られにくい設計。')}
+  <h2>対象カード</h2><div class="panel">${cardTable(c.cards)}</div>${ebayCta()}`;
+}
+function pageCard(id){
+  const c=CARDS.find(x=>x.id===id);if(!c)return '<p>not found</p>';
+  const cat=CATS.find(x=>x.id===c.cat),ch=pct(c.idx),p=last(c.price);
+  const t=[...c.trades].reverse().slice(0,20);
+  return `<div class="crumb"><a href="#/">TOP</a> › <a href="#/category/${cat.id}">${cat.name}</a> › ${c.name}</div>
+  <h1>${c.name} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en} ／ ${c.box}</div>
+  <div class="panel"><div class="hero"><div><div class="meta">相場(7日中央値)</div><div class="big">${usd(p)}</div><div class="meta">${jpy(p)}(1USD=${JPY}円・仮)</div></div>
+    <div><div class="meta">カード指数</div><div class="chg">${last(c.idx).toFixed(2)}</div></div>
+    <div><div class="meta">前日比</div><div class="chg ${cls(ch)}">${fmtPct(ch)}</div></div>
+    <div><div class="meta">直近7日の取引数</div><div class="chg">${last(c.n7)}件</div></div></div>
+    ${rangeTabs()}
+    ${chart({series:[{data:slice(c.price).map(v=>v),color:'var(--accent)',w:2.4}],labels:sliceL(),fmt:v=>'$'+Math.round(v)})}
+    <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c)}" target="_blank" rel="noopener">eBay で最新の落札を見る ↗</a></div></div>
+  <h2>取引履歴(直近20件)</h2><div class="panel"><table><thead><tr><th>購入日</th><th class="r">価格(USD)</th><th class="r">円換算</th><th>eBay</th></tr></thead><tbody>
+  ${t.map(x=>`<tr><td>${x.date}</td><td class="r">${usd(x.usd)}</td><td class="r">${jpy(x.usd)}</td><td><a href="${ebayUrl(c)}" target="_blank" rel="noopener">eBayで見る ↗</a></td></tr>`).join('')}
+  </tbody></table><div class="meta" style="margin-top:8px">※ プロトタイプのため取引はダミーです。正式版では各取引の eBay 商品ページ URL を表示します。</div></div>`;
+}
+function pageAbout(){
+  return `<h1>指数の算出方法</h1><div class="panel">
+  <h2 style="margin-top:0">1. カード単位の価格</h2><ul class="plain"><li>対象は「カード × PSA 10」。</li><li>直近7日の落札価格の<strong>中央値</strong>を日次の相場とする。</li><li>MAD(中央値絶対偏差)による外れ値除外。取引が無い日は前日値を持ち越す。</li></ul>
+  <h2>2. 集計</h2><ul class="plain"><li>カテゴリ指数: 価格比の<strong>等ウェイト幾何平均</strong>(Jevons型)。</li><li>総合指数: 基準日価格をウェイトとする加重平均(Laspeyres型)。</li><li>構成銘柄は四半期ごとに見直し、連鎖方式(Chain-linked)で指数の連続性を保つ。</li></ul>
+  <h2>3. 平滑化</h2><ul class="plain"><li>公表値は EMA で平滑化し、日次のブレを抑制。</li><li>ランキングは取引件数の少ないカードを除外。</li></ul>
+  <h2>4. データ出典</h2><ul class="plain"><li>eBay の落札(Sold)データ。正式版では eBay Marketplace Insights API を利用。</li><li>生データの一括配布は行わず、指数・サマリと eBay へのリンクを提供。</li></ul></div>`;
+}
+
+function pageGuide(){
+  const ext=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`;
+  return `<div class="crumb"><a href="#/">TOP</a> › 買い物ガイド</div>
+  <h1>日本からeBayで買い物できるの？</h1>
+  <p>できます。eBay(ebay.com)は日本の住所への発送に対応している出品者が多く、日本からでもアカウントを作れば購入できます。ここではカードを買うまでの流れを、簡単にまとめます。公式の案内は ${ext('https://www.ebay.co.jp/how-to-buy/','eBay 公式「購入方法」')} も確認してください。</p>
+  <ol class="steps">
+    <li><h3>アカウントを作る</h3>ebay.com を開き、<span class="mono">Register</span> を選びます。個人アカウントで、氏名・メールアドレス・パスワードを入力します。Google や Apple のアカウントでも登録できます。メールの確認が済めば完了です。</li>
+    <li><h3>配送先住所を英語で登録する</h3>My eBay の Account から住所を登録します。ローマ字で、郵便番号・電話番号も入力します。画面右上の <span class="mono">Ship to</span> を Japan にすると、日本に送れる商品だけが表示されます。</li>
+    <li><h3>カードを探す</h3>検索欄に、本サイトのカードページに表示している検索ワード(例: <span class="mono">PSA 10 Charizard ex 201/165</span>)を入れます。カードページの「eBayで最新の落札を見る」からも、同じ検索に移動できます。</li>
+    <li><h3>出品者とカードを確認する</h3>評価数が多く、評価の高い出品者(Top Rated など)を選びます。写真で、PSA のケースと認定番号(Cert番号)、カードの状態を確認します。返品条件と送料も、購入前に見ておきます。</li>
+    <li><h3>買う</h3>固定価格の <span class="mono">Buy It Now</span>、入札の <span class="mono">Place Bid</span>、価格交渉の <span class="mono">Make Offer</span> があります。初めてなら、すぐ買える Buy It Now がおすすめです。</li>
+    <li><h3>支払う</h3>クレジットカード(Visa・Mastercard)、PayPal、Apple Pay、Google Pay などが使えます。JCB や American Express が使えない場合があるので、決済画面で確認してください。外貨決済になるため、為替手数料はカード会社や決済方法によって変わります。</li>
+    <li><h3>届くまで・届いてから</h3>My eBay の購入履歴から追跡できます。日本到着時に、輸入消費税などが課されることがあります。高額なカードは課税対象になりやすく、配送業者から受取時に請求されるのが一般的です。免税の条件は変わることがあるため、<a href="https://www.customs.go.jp/" target="_blank" rel="noopener">税関のサイト ↗</a> で最新の情報を確認してください。商品を受け取ったら、フィードバックを残して完了です。</li>
+  </ol>
+  <div class="note">本ページは一般的な案内です。手数料・税・規約は変更されることがあります。購入前に eBay 公式ページと、各サービスの最新情報を確認してください。本サイトは eBay Inc. とは無関係の非公式サイトです。</div>
+  <h2>参考リンク</h2>
+  <div class="panel"><ul class="plain">
+    <li>${ext('https://www.ebay.co.jp/how-to-buy/','eBay 公式: 購入方法(eBay Japan)')}</li>
+    <li>${ext('https://www.customs.go.jp/','税関(輸入時の税金に関する最新情報)')}</li>
+  </ul></div>`;
+}
+// ---------- ルーター ----------
+let route=location.hash.replace(/^#\/?/,'');
+function render(){
+  const h=route.split('/');
+  const app=document.getElementById('app');
+  app.innerHTML = h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():pageTop();
+  window.scrollTo(0,0);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.tabs button');if(b){state.range=+b.dataset.r;const y=scrollY;render();scrollTo(0,y)}});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#/"]');if(!a)return;e.preventDefault();route=a.getAttribute('href').slice(2);try{history.replaceState(null,'',a.getAttribute('href'))}catch(x){}render()});
+window.addEventListener('hashchange',()=>{route=location.hash.replace(/^#\/?/,'');render()});render();
+</script>
+</body>
+</html>
