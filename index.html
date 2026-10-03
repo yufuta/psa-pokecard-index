@@ -58,7 +58,7 @@ ul.plain{padding-left:20px;margin:6px 0}
 <body>
 <header><div class="wrap">
   <a class="logo" href="#/">PSA ポケカ指数 <span class="meta">JP × eBay</span></a>
-  <nav><a href="#/about">指数の算出方法</a><a class="guide" href="#/guide">日本からeBayで買い物できるの？</a></nav>
+  <nav><a href="#/en" lang="en">English</a><a href="#/about">指数の算出方法</a><a class="guide" href="#/guide">日本からeBayで買い物できるの？</a></nav>
 </div></header>
 <div class="banner">PROTOTYPE — 表示データはすべて<strong>ダミー(乱数生成)</strong>です。カテゴリ・対象カードは仮置きです。</div>
 <main><div class="wrap" id="app"></div></main>
@@ -253,12 +253,44 @@ function pageGuide(){
     <li>${ext('https://www.customs.go.jp/','税関(輸入時の税金に関する最新情報)')}</li>
   </ul></div>`;
 }
+function pageEn(){
+  return `<div lang="en">
+  <h1>PSA Pokémon Card Index: eBay Sold Prices of Japanese Cards</h1>
+  <div class="note" style="margin:8px 0 16px">This is a prototype. All prices, trades and index values shown on the site are randomly generated sample data. The site UI is in Japanese; this page summarizes it in English.</div>
+  <h2 style="margin-top:0">What this site is</h2>
+  <p>A daily price index for PSA 10 graded Japanese Pokémon cards, based on eBay sold-item prices. It shows an overall index, category indices, and a price chart for each card, with links to eBay.</p>
+  <h2>Why we are building it</h2>
+  <p>Japanese collectors pay close attention to overseas prices, especially eBay, but many have never visited eBay. No Japanese-language service presents eBay sold-price trends clearly. This site is meant to be a gateway: users come to see what cards actually sold for, then move to eBay. We do not claim it directly increases purchases. A Japanese-language buying guide ("Can I buy on eBay from Japan?") explains how to create an account and make a first purchase, and links to eBay's official how-to-buy page.</p>
+  <h2>How the index is built</h2>
+  <ul class="plain">
+    <li>Card price: rolling 7-day median of sold prices for each card (PSA 10), with outlier removal (MAD). On days without sales, the previous value is carried forward.</li>
+    <li>Category index: equal-weight geometric mean of card price ratios (Jevons-type).</li>
+    <li>Overall index: weighted by base-date prices (Laspeyres-type). Constituents are reviewed quarterly and chain-linked.</li>
+    <li>The published value is smoothed with an EMA to reduce day-to-day volatility. Cards with few recent sales are excluded from the daily gainers/losers rankings.</li>
+  </ul>
+  <h2>Scope and data</h2>
+  <ul class="plain">
+    <li>100 cards in two categories (Pokémon cards and Supporter cards). Batch retrieval runs twice a day (00:00 and 12:00 JST).</li>
+    <li>Planned data source: eBay Marketplace Insights API. We will not provide bulk downloads of raw data.</li>
+    <li>Each card page links to eBay listings. We would like to show the most recent 20 transactions per card, and will follow eBay's instructions on what may be displayed.</li>
+    <li>eBay is credited as the source, and the site states that it is unofficial and unaffiliated with eBay.</li>
+  </ul>
+  <h2>Pages to look at</h2>
+  <div class="panel"><ul class="plain">
+    <li><a href="#/" lang="ja">Top page</a>: overall index, categories, daily top 10 gainers and losers</li>
+    <li><a href="#/category/pokemon" lang="ja">Category page</a>: category index and its card list</li>
+    <li><a href="#/card/c023" lang="ja">Card page</a>: price chart, recent transactions with eBay links</li>
+    <li><a href="#/guide" lang="ja">Buying guide for Japanese users</a> (Japanese)</li>
+    <li><a href="#/about" lang="ja">Methodology</a> (Japanese)</li>
+  </ul></div>
+  </div>`;
+}
 // ---------- ルーター ----------
 let route=location.hash.replace(/^#\/?/,'');
 function render(){
   const h=route.split('/');
   const app=document.getElementById('app');
-  app.innerHTML = h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():pageTop();
+  app.innerHTML = h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():h[0]==='en'?pageEn():pageTop();
   window.scrollTo(0,0);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs button');if(b){state.range=+b.dataset.r;const y=scrollY;render();scrollTo(0,y)}});
