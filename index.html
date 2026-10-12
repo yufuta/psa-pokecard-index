@@ -50,6 +50,18 @@ td.r,th.r{text-align:right}
 .tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .chartbox{position:relative}
 .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:3px 8px;border-radius:6px;display:none;white-space:nowrap}
+.nm{display:flex;align-items:center;gap:10px}
+.cimg{border-radius:4px;object-fit:cover;background:var(--line);flex:none}
+.cimg.xs,.cbadge.xs{width:28px;height:39px}
+.cimg.s,.cbadge.s{width:40px;height:56px}
+.cimg.l,.cbadge.l{width:112px;height:157px;border-radius:8px}
+.cbadge{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;flex:none;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--sub);line-height:1.15;text-align:center;overflow:hidden}
+.cbadge b{font-size:11px;color:var(--ink);font-variant-numeric:tabular-nums}
+.cbadge i{font-size:9px;font-style:normal}
+.cbadge.l{border-radius:8px}.cbadge.l b{font-size:22px}.cbadge.l i{font-size:13px}
+.cbadge.xs b{font-size:9px}.cbadge.xs i{font-size:7px}
+.cardhead{display:flex;gap:16px;align-items:flex-start;margin-bottom:6px}
+.cardhead h1{margin-top:2px}
 .yen{color:var(--sub);font-size:.88em;font-variant-numeric:tabular-nums}
 .info{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--sub);color:var(--sub);background:none;font:italic 700 10px/1 Georgia,serif;margin-left:4px;padding:0;cursor:pointer;vertical-align:middle}
 .info:hover,.info:focus-visible{color:var(--accent);border-color:var(--accent)}
@@ -131,14 +143,18 @@ function basketBlock(b,note){
     ${chart(pts,state.metric==='index'?v=>v.toFixed(1):v=>'$'+Math.round(v).toLocaleString('en-US'))}
   </div>`;
 }
+function thumb(c,size){
+  if(c.image) return `<img class="cimg ${size}" src="${c.image}" alt="${c.name_jp}" loading="lazy">`;
+  return `<span class="cbadge ${size}"><b>${c.number.split('/')[0]}</b><i>${c.set_code||(c.number.split('/')[1]||'')}</i></span>`;
+}
 function cardTable(ids){
   const rows=ids.map(id=>[id,D.cards[id]]).sort((a,b)=>(b[1].price_usd||0)-(a[1].price_usd||0));
-  return `<table><thead><tr><th>カード</th><th class="r">価格(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}</td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(dod(c))}">${pctTxt(dod(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
+  return `<table><thead><tr><th>カード</th><th class="r">価格(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}</div></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(dod(c))}">${pctTxt(dod(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
 }
 function movers(){
   const rows=Object.entries(D.cards).filter(([,c])=>c.flag==='ok'&&dod(c)!=null).map(([id,c])=>[id,c,dod(c)]).sort((a,b)=>b[2]-a[2]);
   if(!rows.length) return `<h2>前日から動いたカード</h2><div class="panel empty">前日比は、2日分のデータがそろった翌日から表示されます。</div>`;
-  const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><a href="#/card/${id}">${c.name_jp}</a></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
+  const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><div class="nm">${thumb(c,"xs")}<a href="#/card/${id}">${c.name_jp}</a></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
   return `<div class="two"><div><h2>前日から上がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]>0).slice(0,10))}</div></div><div><h2>前日から下がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]<0).slice(-10).reverse())}</div></div></div>`;
 }
 function ebayCta(){return `<h2>eBay で実際の出品を確認する</h2><div class="panel cta"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="https://www.ebay.com/" target="_blank" rel="noopener">eBay を開く ↗</a></div></div>`}
@@ -168,7 +184,7 @@ function pageCard(id){
   const pts=sliceH(c.history).map(h=>[h[0],h[1]]);
   const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
   return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
-  <h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}</div>
+  <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}</div></div></div>
   <div class="panel"><div class="hero"><div><div class="meta">価格(PSA 10)</div><div class="big">${usd(c.price_usd)}</div><div class="meta">${yenInfo(c.price_usd)}</div></div>
     <div><div class="meta">前日比</div><div class="chg ${cls(dod(c))}">${pctTxt(dod(c))}</div></div>
     <div><div class="meta">使った出品</div><div class="chg">${c.n_kept==null?'—':c.n_kept+'件'}</div></div></div>
@@ -183,7 +199,7 @@ function pageAbout(){
   return `<h1>指数の算出方法</h1><div class="panel">
   <h2 style="margin-top:0">1. 対象と価格の算出</h2><ul class="plain"><li>対象は「日本語版ポケモンカード × PSA 10」です(一部、英語版のプロモカードを例外として含みます)。</li><li>eBay(米国)の、<strong>即決・米国内発送の商品を対象に、各カードごとに絞り込み、外れ値を除外して算出</strong>します。毎日1回、更新しています。</li><li>出品が少ないカードは、前日の値を表示し、その旨を表示します。急な大きな変動は、確認のため、一時的に保留することがあります。</li></ul>
   <h2>2. バスケット価格と指数</h2><ul class="plain"><li><strong>1枚あたりの平均価格</strong>: 対象カードの価格の平均です。</li><li><strong>バスケット価格</strong>: 対象カードの価格の合計です(対象を1枚ずつ全部買った場合の金額)。</li><li><strong>指数</strong>: 基準日を100とし、各カードの価格の変化を、同じ重みで平均した値です(高額なカードの動きだけに、偏らないようにしています)。対象カードを入れ替えた日は、前後で同じ水準になるよう、調整係数をかけます。</li><li>変化率は、前日・7日・30日・90日で表示します。</li></ul>
-  <h2>3. ご注意</h2><ul class="plain"><li>これは、<strong>出品価格(売り手の希望価格)</strong>の指数で、実際に売れた価格(成約価格)ではありません。</li><li>為替は、欧州中央銀行(ECB)の参照レートを使い、円に換算しています。目安です。</li><li>対象カードは、今後、見直し・拡大する場合があります。</li></ul></div>`;
+  <h2>3. ご注意</h2><ul class="plain"><li>為替は、欧州中央銀行(ECB)の参照レートを使い、円に換算しています。目安です。</li><li>対象カードは、今後、見直し・拡大する場合があります。</li></ul></div>`;
 }
 function pageGuide(){
   const ext=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`;
@@ -224,7 +240,7 @@ function pageTerms(){
   <div class="panel">
   ${legalSec('1. 本サイトについて','<p>本サイトは、PSA 鑑定済みの日本語版ポケモンカードの、eBay での出品価格をもとに、価格指数を表示する、個人運営の非公式サイトです。eBay Inc.、PSA(Professional Sports Authenticator)、ポケモン関連の権利者とは、提携・協力関係にありません。ポケモン、Pokémon、ポケモンカードに関する名称・商標は、各権利者に帰属します。</p>')}
   ${legalSec('2. 試験運用中であること','<p>現在は試験運用の段階です。対象カードや表示内容は、予告なく変更することがあります。</p>')}
-  ${legalSec('3. 情報の性質','<p>本サイトの情報は、参考情報の提供のみを目的としています。投資・購入・売却の助言や勧誘ではありません。表示する価格は、出品価格(売り手の希望価格)から算出した値で、実際に売れた価格ではありません。価格や指数の正確性、完全性、最新性は、保証しません。表示は、1日1回の算出値で、eBay 上の最新の状況より、最大約24時間古い場合があります。為替の換算も、目安です。</p>')}
+  ${legalSec('3. 情報の性質','<p>本サイトの情報は、参考情報の提供のみを目的としています。投資・購入・売却の助言や勧誘ではありません。価格や指数の正確性、完全性、最新性は、保証しません。表示は、1日1回の算出値で、eBay 上の最新の状況より、最大約24時間古い場合があります。為替の換算も、目安です。</p>')}
   ${legalSec('4. eBay での取引','<p>eBay を含む外部サイトでの取引は、利用者ご自身の責任で行ってください。取引で生じた損害やトラブルについて、運営者は責任を負いません。購入前に、eBay の規約や出品者の評価、商品の状態、返品条件をご確認ください。</p>')}
   ${legalSec('5. 禁止事項','<p>本サイトの内容の無断転載、自動的な大量取得(スクレイピングなど)、サイトの運営を妨げる行為を禁止します。</p>')}
   ${legalSec('6. 著作権','<p>本サイトの文章、デザイン、指数の算出結果の著作権は、運営者に帰属します。eBay などの第三者のデータや商標は、各権利者に帰属します。出典を明記した引用は、法令の範囲で認められます。</p>')}
@@ -238,7 +254,7 @@ function pageSource(){
   ${legalSec('データの出典','<p>本サイトの価格は、eBay(米国)の出品情報をもとに算出しています。eBay の Browse API から、即決価格の出品を取得しています。</p>')}
   ${legalSec('取得と更新','<ul class="plain"><li>取得頻度: 1日1回</li><li>対象: 日本語版ポケモンカード、PSA 10(一部、英語版のプロモカード)。対象は、サイトの成長に合わせて見直すことがあります。</li><li>表示している価格は、算出した値で、eBay 上の最新の価格より、最大約24時間古い場合があります。個別の出品は、表示していません。</li></ul>')}
   ${legalSec('保存するデータ','<ul class="plain"><li>保存する: カードごとの算出した価格、使った出品の件数</li><li>保存しない: 購入者・出品者の識別情報、その他の個人情報</li></ul>')}
-  ${legalSec('価格の算出','<p>詳しくは、<a href="#/about">指数の算出方法</a>をご覧ください。出品価格(売り手の希望価格)から算出しており、実際に売れた価格ではありません。</p>')}
+  ${legalSec('価格の算出','<p>詳しくは、<a href="#/about">指数の算出方法</a>をご覧ください。</p>')}
   ${legalSec('為替','<p>円への換算は、欧州中央銀行(ECB)が公表する参照レートを使った目安です。</p>')}
   ${legalSec('日本の相場について','<p>日本の相場を表示する場合は、「日本相場(参考:スニーカーダンク)」と出典を明記します。</p>')}
   ${legalSec('eBay について','<p>eBay は eBay Inc. の商標です。本サイトは、eBay Inc. とは無関係の非公式サイトです。</p>')}
