@@ -89,7 +89,12 @@ ul.plain{padding-left:20px;margin:6px 0}
 
 <script src="data/latest.js"></script>
 <script>
+const GA_ID = 'G-6X43R1P4MT';
+const EPN_CAMPID = '5339221531';   // eBay Partner Network campaign ID (affiliate links are off while empty)   // Google Analytics 4 measurement ID (G-XXXXXXXXXX); empty = no analytics
 const D = window.PSA_DATA;
+if(GA_ID){const g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;document.head.appendChild(g);
+  window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA_ID,{send_page_view:false});}
+const track=(name,params)=>{if(GA_ID&&window.gtag)gtag('event',name,params)};
 const state = {range:0, metric:'index'};
 const el = id => document.getElementById(id);
 // ---------- helpers ----------
@@ -103,21 +108,26 @@ const ud = v => `${usd(v)} ${yenInfo(v)}`;
 const pctTxt = r => r==null?'—':`${r>=0?'+':''}${(r*100).toFixed(2)}%`;
 const cls = r => r==null?'':(r>=0?'up':'down');
 const jst = iso => new Date(iso).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-const ebayUrl = c => 'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent('PSA 10 '+c.query)+'&LH_BIN=1';
+const epn = (url,custom) => EPN_CAMPID ? url+(url.includes('?')?'&':'?')+'mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid='+EPN_CAMPID+'&customid='+encodeURIComponent(custom||'')+'&toolid=10001&mkevt=1' : url;
+const relEbay = EPN_CAMPID ? 'sponsored nofollow noopener' : 'noopener';
+const ebayUrl = (c,id) => epn('https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent('PSA 10 '+c.query)+'&LH_BIN=1', id);
+if(EPN_CAMPID){const bn=document.querySelector&&document.querySelector('.banner');if(bn)bn.innerHTML+=' ／ <strong>PR</strong> eBay へのリンクには、アフィリエイト広告が含まれます。';}
 const FLAG = {anchor:'日本の相場をもとにした参考値(米国の出品が少ないため)', thin:'出品が少ない(日本の相場も加味した参考値)', held:'保留中(急な変動を確認中)', no_data:'データ不足(前日の値を表示)', confirmed_move:'急な変動を確認済み'};
 const flagPill = f => FLAG[f]?`<span class="pill">${FLAG[f]}</span>`:'';
 const last2 = h => h.length>=2?[h[h.length-2][1],h[h.length-1][1]]:null;
 const dod = c => {const l=last2(c.history);return l&&l[0]?l[1]/l[0]-1:null};
 const sliceH = a => state.range&&a.length>state.range?a.slice(-state.range):a;
 
-function chart(points, fmt){ // points: [[label, value]]
+function chart(points, fmt, fine){ // points: [[label, value]]
   if(points.length<2) return `<div class="empty">グラフは、2日分以上のデータがそろってから表示されます。(現在 ${points.length} 日分)</div>`;
   const W=720,H=240,P={l:52,r:10,t:10,b:22},n=points.length,vals=points.map(p=>p[1]);
   const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||Math.abs(mx)*0.02||1,lo=mn-pad,hi=mx+pad;
   const X=i=>P.l+(W-P.l-P.r)*i/(n-1),Y=v=>P.t+(H-P.t-P.b)*(1-(v-lo)/(hi-lo));
   let g='';
-  for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--sub)">${fmt(v)}</text>`}
-  [0,.5,1].forEach(f=>{const i=Math.round((n-1)*f);g+=`<text x="${X(i)}" y="${H-5}" text-anchor="${f===0?'start':f===1?'end':'middle'}" font-size="11" fill="var(--sub)">${points[i][0].slice(5)}</text>`});
+  const tv=[0,1,2,3,4].map(k=>lo+(hi-lo)*k/4);
+  let tf=fmt;if(new Set(tv.map(fmt)).size<5)tf=fine||(v=>v.toFixed(2));
+  tv.forEach(v=>{const y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--sub)">${tf(v)}</text>`});
+  [...new Set(n<=3?[...Array(n).keys()]:[0,Math.round((n-1)/2),n-1])].forEach(i=>{g+=`<text x="${X(i)}" y="${H-5}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="11" fill="var(--sub)">${points[i][0].slice(5)}</text>`});
   const line=`<polyline fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" points="${points.map((p,i)=>X(i).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')}"/>`;
   const id='c'+Math.random().toString(36).slice(2,8);
   setTimeout(()=>{const box=el(id);if(!box)return;const svg=box.querySelector('svg'),tip=box.querySelector('.tip');
@@ -140,7 +150,7 @@ function basketBlock(b,note){
     <div class="meta">${note||''}</div>
     <div class="meta" style="margin-top:6px">参考(実際の価格): 1枚あたりの平均 ${ud(b.mean_usd)} ／ 中央値 ${ud(b.median_usd)} ／ バスケット価格(${b.n_cards}枚の合計) ${ud(b.total_usd)}</div>
     ${metricTabs()}${b.history.length>30?rangeTabs():''}
-    ${chart(pts,state.metric==='index'?v=>v.toFixed(1):v=>'$'+Math.round(v).toLocaleString('en-US'))}
+    ${chart(pts,state.metric==='index'?v=>v.toFixed(1):v=>'$'+Math.round(v).toLocaleString('en-US'),state.metric==='index'?v=>v.toFixed(3):v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
   </div>`;
 }
 function thumb(c,size){
@@ -157,7 +167,7 @@ function movers(){
   const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><div class="nm">${thumb(c,"xs")}<a href="#/card/${id}">${c.name_jp}</a></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
   return `<div class="two"><div><h2>前日から上がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]>0).slice(0,10))}</div></div><div><h2>前日から下がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]<0).slice(-10).reverse())}</div></div></div>`;
 }
-function ebayCta(){return `<h2>eBay で実際の出品を確認する</h2><div class="panel cta"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="https://www.ebay.com/" target="_blank" rel="noopener">eBay を開く ↗</a></div></div>`}
+function ebayCta(){return `<h2>eBay で実際の出品を確認する</h2><div class="panel cta"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="${epn('https://www.ebay.com/','cta')}" target="_blank" rel="${relEbay}">eBay を開く ↗</a></div></div>`}
 
 // ---------- pages ----------
 function pageTop(){
@@ -190,8 +200,8 @@ function pageCard(id){
     <div><div class="meta">使った出品</div><div class="chg">${c.n_kept==null?'—':c.n_kept+'件'}</div></div></div>
     ${flagPill(c.flag)}
     ${c.history.length>30?rangeTabs():''}
-    ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'))}
-    <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c)}" target="_blank" rel="noopener">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
+    ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'),v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
+    <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
     <div class="meta" style="margin-top:8px">価格は、1日1回の算出値です(最大約24時間古い場合があります)。出品の価格や在庫は、eBay で最新の状況をご確認ください。</div></div>
   ${jp}`;
 }
@@ -228,8 +238,9 @@ function pagePrivacy(){
   <div class="panel">
   ${legalSec('1. 取得する情報','<p>本サイトでは、氏名・メールアドレスなどの個人情報を入力するフォームを設けておらず、これらを直接取得することはありません。ただし、アクセス解析ツールにより、閲覧したページ、閲覧日時、参照元、端末やブラウザの種類、おおよその地域などの情報が、Cookie などを通じて自動的に収集される場合があります。これらの情報から、個人を特定することはできません。</p>')}
   ${legalSec('2. 利用目的','<p>収集した情報は、サイトの利用状況の把握と、コンテンツや使いやすさの改善のために利用します。</p>')}
-  ${legalSec('3. アクセス解析ツール','<p>本サイトは、アクセス状況を把握するために、Google アナリティクスなどのアクセス解析ツールを利用することがあります。ツールは、Cookie を使ってデータを収集します。収集されるデータは匿名で、個人を特定するものではありません。Cookie は、ブラウザの設定で無効にできます。無効にしても、サイトはご利用いただけます。各ツールのデータの取り扱いは、提供元のポリシーをご確認ください。</p>')}
+  ${legalSec('3. アクセス解析ツール',GA_ID?'<p>本サイトは、アクセス状況を把握するために、Google LLC の「Google アナリティクス」を利用しています。Google アナリティクスは、Cookie を使って、閲覧したページ、閲覧日時、参照元、端末やブラウザの種類、おおよその地域などの情報を収集し、Google に送信します。収集された情報から、個人を特定することはできません。利用目的は、サイトの利用状況の把握と、改善です。</p><p>Cookie は、ブラウザの設定で無効にできます。また、<a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google アナリティクス オプトアウト アドオン ↗</a>で、収集を無効にできます。Google による情報の取り扱いは、<a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">Google のポリシー ↗</a>をご確認ください。</p>':'<p>本サイトは、アクセス解析ツールを利用することがあります。利用する場合は、ツール名、収集する情報、利用目的、無効にする方法を、本ページに明記します。</p>')}
   ${legalSec('4. eBay のユーザー情報について','<p>本サイトは、eBay の購入者・出品者の氏名、ユーザー名、連絡先などの個人情報を、取得・保存しません。出品者の評価などは、出品を絞り込む判定にだけ使い、保存しません。保存するのは、カードごとの算出した価格と、使った出品の件数などの集計です。</p>')}
+  ${EPN_CAMPID?legalSec('アフィリエイトプログラムについて','<p>本サイトは、eBay Partner Network のアフィリエイトプログラムに参加しています。eBay へのリンクを経由して、商品が購入された場合に、本サイトの運営者が、報酬を得ることがあります。リンクを押すと、eBay(および eBay Partner Network)が、Cookie などを使って、リンクの経由を記録します。取り扱いは、eBay のプライバシーに関する方針に従います。報酬の有無によって、本サイトの指数や価格の算出は、変わりません。</p>'):''}
   ${legalSec('5. 外部サイトへのリンク','<p>本サイトには、eBay など外部サイトへのリンクがあります。リンク先での個人情報の取り扱いは、各サイトのポリシーに従います。</p>')}
   ${legalSec('6. 第三者への提供','<p>法令に基づく場合を除き、取得した情報を、本人の同意なく第三者に提供しません。</p>')}
   ${legalSec('7. 改定','<p>本ポリシーは、必要に応じて改定することがあります。改定後の内容は、本ページに掲載した時点から効力を持ちます。</p>')}
@@ -241,6 +252,7 @@ function pageTerms(){
   ${legalSec('1. 本サイトについて','<p>本サイトは、PSA 鑑定済みの日本語版ポケモンカードの、eBay での出品価格をもとに、価格指数を表示する、個人運営の非公式サイトです。eBay Inc.、PSA(Professional Sports Authenticator)、ポケモン関連の権利者とは、提携・協力関係にありません。ポケモン、Pokémon、ポケモンカードに関する名称・商標は、各権利者に帰属します。</p>')}
   ${legalSec('2. 試験運用中であること','<p>現在は試験運用の段階です。対象カードや表示内容は、予告なく変更することがあります。</p>')}
   ${legalSec('3. 情報の性質','<p>本サイトの情報は、参考情報の提供のみを目的としています。投資・購入・売却の助言や勧誘ではありません。価格や指数の正確性、完全性、最新性は、保証しません。表示は、1日1回の算出値で、eBay 上の最新の状況より、最大約24時間古い場合があります。為替の換算も、目安です。</p>')}
+  ${EPN_CAMPID?legalSec('広告・アフィリエイトについて','<p>本サイトの eBay へのリンクには、アフィリエイト広告(eBay Partner Network)が含まれます。リンク経由の購入で、運営者が報酬を得ることがあります。</p>'):''}
   ${legalSec('4. eBay での取引','<p>eBay を含む外部サイトでの取引は、利用者ご自身の責任で行ってください。取引で生じた損害やトラブルについて、運営者は責任を負いません。購入前に、eBay の規約や出品者の評価、商品の状態、返品条件をご確認ください。</p>')}
   ${legalSec('5. 禁止事項','<p>本サイトの内容の無断転載、自動的な大量取得(スクレイピングなど)、サイトの運営を妨げる行為を禁止します。</p>')}
   ${legalSec('6. 著作権','<p>本サイトの文章、デザイン、指数の算出結果の著作権は、運営者に帰属します。eBay などの第三者のデータや商標は、各権利者に帰属します。出典を明記した引用は、法令の範囲で認められます。</p>')}
@@ -268,10 +280,12 @@ function render(){
   if(!D){app.innerHTML='<div class="panel">データを読み込めませんでした。時間をおいて、再読み込みしてください。</div>';return}
   app.innerHTML=h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():h[0]==='privacy'?pagePrivacy():h[0]==='terms'?pageTerms():h[0]==='source'?pageSource():pageTop();
   window.scrollTo(0,0);
+  track('page_view',{page_title:document.title,page_location:location.href.split('#')[0]+'#/'+route,page_path:'/'+route});
 }
 const pop=document.createElement('div');pop.className='pop';pop.hidden=true;document.body.appendChild(pop);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')pop.hidden=true});
 document.addEventListener('click',e=>{
+  const eb=e.target.closest('a[href*="ebay."]');if(eb)track('ebay_click',{link_url:eb.href,from_page:route});
   const ib=e.target.closest('.info');
   if(ib){e.preventDefault();e.stopPropagation();const show=pop.hidden||pop.dataset.for!==String([...document.querySelectorAll('.info')].indexOf(ib));
     if(!show){pop.hidden=true;return}
