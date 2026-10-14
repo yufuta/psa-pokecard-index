@@ -95,7 +95,7 @@ const D = window.PSA_DATA;
 if(GA_ID){const g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;document.head.appendChild(g);
   window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA_ID,{send_page_view:false});}
 const track=(name,params)=>{if(GA_ID&&window.gtag)gtag('event',name,params)};
-const state = {range:0, metric:'index'};
+const state = {range:0, metric:'index', cm:null};
 const el = id => document.getElementById(id);
 // ---------- helpers ----------
 const usd = v => v==null?'—':'$'+v.toLocaleString('en-US',{maximumFractionDigits:2});
@@ -116,6 +116,7 @@ const FLAG = {anchor:'日本の相場をもとにした参考値(米国の出品
 const flagPill = f => FLAG[f]?`<span class="pill">${FLAG[f]}</span>`:'';
 const last2 = h => h.length>=2?[h[h.length-2][1],h[h.length-1][1]]:null;
 const dod = c => {const l=last2(c.history);return l&&l[0]?l[1]/l[0]-1:null};
+const dodL = c => {const l=last2(c.lowest_history||[]);return l&&l[0]?l[1]/l[0]-1:null};
 const sliceH = a => state.range&&a.length>state.range?a.slice(-state.range):a;
 
 function chart(points, fmt, fine){ // points: [[label, value]]
@@ -159,7 +160,7 @@ function thumb(c,size){
 }
 function cardTable(ids){
   const rows=ids.map(id=>[id,D.cards[id]]).sort((a,b)=>(b[1].price_usd||0)-(a[1].price_usd||0));
-  return `<table><thead><tr><th>カード</th><th class="r">価格(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}</div></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(dod(c))}">${pctTxt(dod(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
+  return `<table><thead><tr><th>カード</th><th class="r">最安値(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}</div></div></td><td class="r">${c.lowest_usd!=null?ud(c.lowest_usd):'—'}<div class="meta">中央値 ${usd(c.price_usd)}</div></td><td class="r ${cls(dodL(c))}">${pctTxt(dodL(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
 }
 function movers(){
   const rows=Object.entries(D.cards).filter(([,c])=>c.flag==='ok'&&dod(c)!=null).map(([id,c])=>[id,c,dod(c)]).sort((a,b)=>b[2]-a[2]);
@@ -191,14 +192,17 @@ function pageCat(id){
 function pageCard(id){
   const c=D.cards[id];if(!c)return '<p>not found</p>';
   const b=D.baskets.find(x=>x.id!=='all'&&x.card_ids.includes(id));
-  const pts=sliceH(c.history).map(h=>[h[0],h[1]]);
+  const lh=c.lowest_history||[];
+  const cm=state.cm||(lh.length>=2?'lowest':'median');
+  const pts=sliceH(cm==='lowest'?lh:c.history).map(h=>[h[0],h[1]]);
   const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
   return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
   <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}</div></div></div>
-  <div class="panel"><div class="hero"><div><div class="meta">価格(PSA 10)</div><div class="big">${usd(c.price_usd)}</div><div class="meta">${yenInfo(c.price_usd)}</div></div>
-    <div><div class="meta">前日比</div><div class="chg ${cls(dod(c))}">${pctTxt(dod(c))}</div></div>
+  <div class="panel"><div class="hero"><div><div class="meta">最安値(PSA 10)</div><div class="big">${c.lowest_usd!=null?usd(c.lowest_usd):'—'}</div><div class="meta">${c.lowest_usd!=null?yenInfo(c.lowest_usd):'出品の最安値が、取得できませんでした'}</div><div class="meta ${cls(dodL(c))}">前日比 ${pctTxt(dodL(c))}</div></div>
+    <div><div class="meta">中央値</div><div class="big" style="font-size:28px">${usd(c.price_usd)}</div><div class="meta">${yenInfo(c.price_usd)}</div><div class="meta ${cls(dod(c))}">前日比 ${pctTxt(dod(c))}</div></div>
     <div><div class="meta">使った出品</div><div class="chg">${c.n_kept==null?'—':c.n_kept+'件'}</div></div></div>
     ${flagPill(c.flag)}
+    <div class="tabs" style="margin:6px 0 8px">${[['lowest','最安値'],['median','中央値']].map(([m,t])=>`<button data-cm="${m}" class="${cm===m?'on':''}">${t}</button>`).join('')}</div>
     ${c.history.length>30?rangeTabs():''}
     ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'),v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
     <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
@@ -295,7 +299,7 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('a[href^="#/"]');
   if(a){e.preventDefault();route=a.getAttribute('href').slice(2);try{history.replaceState(null,'',a.getAttribute('href'))}catch(x){}render();return}
   const b=e.target.closest('.tabs button');
-  if(b){if(b.dataset.r!==undefined)state.range=+b.dataset.r;if(b.dataset.m)state.metric=b.dataset.m;const y=scrollY;render();scrollTo(0,y)}
+  if(b){if(b.dataset.r!==undefined)state.range=+b.dataset.r;if(b.dataset.m)state.metric=b.dataset.m;if(b.dataset.cm)state.cm=b.dataset.cm;const y=scrollY;render();scrollTo(0,y)}
 });
 window.addEventListener('hashchange',()=>{route=location.hash.replace(/^#\/?/,'');render()});
 render();
