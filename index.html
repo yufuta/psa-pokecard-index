@@ -177,7 +177,8 @@ function pageTop(){
   <div class="meta" style="margin-bottom:12px">データ日付 ${D.date} ／ 更新 ${jst(D.generated_at)}(日本時間) ／ 為替 1ドル=${D.usd_jpy.toFixed(2)}円 ／ 対象 ${all.n_cards}銘柄</div>
   ${basketBlock(all,'指数は、各カードの価格の変化を、同じ重みで平均した値です(高額なカードだけに、偏りません)。実際の価格の平均や合計は、参考として併記しています。各カードの価格は、eBay の出品情報をもとに、毎日1回算出しています(算出方法は「指数の算出方法」をご覧ください)。')}
   <h2>カテゴリ</h2>
-  <div class="grid">${cats.map(c=>`<a class="panel cat" href="#/category/${c.id}"><div class="n">${c.name}</div><div class="meta">${c.description}</div>
+  <div class="grid">${cats.map(c=>c.reference?`<a class="panel cat" href="#/category/${c.id}"><div class="n">${c.name}</div><div class="meta">${c.description}</div>
+    <div style="display:flex;justify-content:flex-end;align-items:baseline;margin-top:8px"><div class="meta">${c.n_cards}枚</div></div></a>`:`<a class="panel cat" href="#/category/${c.id}"><div class="n">${c.name}</div><div class="meta">${c.description}</div>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><div><span class="meta">指数</span> <span style="font-size:22px;font-weight:700">${c.index.toFixed(2)}</span> <span class="${cls(c.change['1d'])}">${pctTxt(c.change['1d'])}</span></div><div class="meta">${c.n_cards}枚 ／ 平均 ${usd(c.mean_usd)}</div></div></a>`).join('')}</div>
   ${movers()}
   <div class="meta" style="margin-top:6px">※ ランキングは、通常の値動きのカードだけが対象です(データ不足や保留中のカードは除きます)。</div>
@@ -186,7 +187,7 @@ function pageTop(){
 function pageCat(id){
   const b=D.baskets.find(x=>x.id===id);if(!b)return '<p>not found</p>';
   return `<div class="crumb"><a href="#/">TOP</a> › カテゴリ</div><h1>${b.name}</h1><div class="meta" style="margin-bottom:12px">${b.description} ／ ${b.n_cards}銘柄</div>
-  ${basketBlock(b,'指数は、カテゴリ内の各カードの価格の変化を、同じ重みで平均した値です。実際の価格の平均や合計は、参考として併記しています。')}
+  ${b.reference?`<div class="panel" style="margin-bottom:12px"><div class="meta">取得件数が少ないため、あくまでも参考としてください。この一覧のカードは、指数の算出には使っていません。</div></div>`:basketBlock(b,'指数は、カテゴリ内の各カードの価格の変化を、同じ重みで平均した値です。実際の価格の平均や合計は、参考として併記しています。')}
   <h2>対象カード</h2><div class="panel">${cardTable(b.card_ids)}</div>${ebayCta()}`;
 }
 function pageCard(id){
@@ -198,6 +199,7 @@ function pageCard(id){
   const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
   return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
   <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}</div></div></div>
+  ${c.reference?`<div class="panel" style="margin-bottom:12px;border-color:#d9a400"><strong>参考</strong> ― 取得件数が少ないため、あくまでも参考としてください。(指数には含めていません)</div>`:''}
   <div class="panel"><div class="hero"><div><div class="meta">最安値(PSA 10)</div><div class="big">${c.lowest_usd!=null?usd(c.lowest_usd):'—'}</div><div class="meta">${c.lowest_usd!=null?yenInfo(c.lowest_usd):'出品の最安値が、取得できませんでした'}</div><div class="meta ${cls(dodL(c))}">前日比 ${pctTxt(dodL(c))}</div></div>
     <div><div class="meta">中央値</div><div class="big" style="font-size:28px">${usd(c.price_usd)}</div><div class="meta">${yenInfo(c.price_usd)}</div><div class="meta ${cls(dod(c))}">前日比 ${pctTxt(dod(c))}</div></div>
     <div><div class="meta">使った出品</div><div class="chg">${c.n_kept==null?'—':c.n_kept+'件'}</div></div></div>
