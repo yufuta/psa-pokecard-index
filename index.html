@@ -3,238 +3,514 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PSA ポケカ指数</title>
+<!--SEO_HEAD-->
+<title>ポケカ相場指数｜PSA10の価格推移を毎日更新 - PSAポケカ指数</title>
+<meta name="description" content="旧裏からサン＆ムーンまで、ポケモンカード(PSA10)の相場を指数とグラフで毎日更新。シリーズ別・カード別・イラストレーター別に見られます。">
 <meta name="robots" content="noindex">
+<!--/SEO_HEAD-->
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#1a1d23;--sub:#667085;--line:#e4e7ec;--up:#0a8f4e;--down:#d92d20;--accent:#2f5bea;--raw:#c3cad6;--warn:#fff4d6;--warnink:#7a5200}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#181c24;--ink:#eceff4;--sub:#9aa4b2;--line:#2a303b;--up:#35c47c;--down:#ff6b5e;--accent:#7b9bff;--raw:#3b4452;--warn:#3a2f10;--warnink:#f5d98a;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1218;--card:#181c24;--ink:#eceff4;--sub:#9aa4b2;--line:#2a303b;--up:#35c47c;--down:#ff6b5e;--accent:#7b9bff;--raw:#3b4452;--warn:#3a2f10;--warnink:#f5d98a;color-scheme:dark}
+:root{
+  --c-base:#8CD0DC;--c-base-deep:#1D6F80;--c-base-pale:#E4F4F7;--c-bg:#FFF9F0;--c-surface:#FFFFFF;
+  --c-cta:#FFD25E;--c-cta-shadow:#E3B23C;--c-pink:#F7B9C4;--c-ink:#3B3A45;--c-ink-sub:#6B6F7A;--c-line:#D5ECF0;
+  --c-up:#17734F;--c-up-bg:#E3F4EA;--c-up-line:#2E9E6E;--c-down:#C2413A;--c-down-bg:#FDE8E6;--c-down-line:#E0685F;
+  --c-flat:#6B6F7A;--c-flat-bg:#EEF0F2;--c-flat-line:#A3AAB3;--c-warn:#FFF1C7;--c-warn-ink:#7A5A00;--c-foot:#F3EBDD;
+  --r-s:8px;--r-m:14px;--r-l:20px;--r-pill:999px;
+  --sh-sticker:0 3px 0 #D5ECF0,0 6px 16px rgba(59,58,69,.06);--sh-hover:0 5px 0 #BFE3EA,0 10px 24px rgba(59,58,69,.10);
+  --border:2px solid #E4F4F7;
+  --font:"Hiragino Maru Gothic ProN","ヒラギノ丸ゴ ProN","BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Yu Gothic","Meiryo",system-ui,sans-serif;
+  --font-num:"SF Pro Rounded","Hiragino Maru Gothic ProN","BIZ UDPGothic",system-ui,sans-serif;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,"Hiragino Sans","Yu Gothic",sans-serif}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
-header{background:var(--card);border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding-block:6px;flex-wrap:wrap;gap:8px 12px}
-.logo{font-weight:700;font-size:17px;color:var(--ink)}
-nav{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px}
-nav a{color:var(--sub);font-size:14px}
-nav a.guide{color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 12px;font-weight:600}
-.panel{overflow-x:auto}
-.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:12px}
-.steps>li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 52px;position:relative}
-.steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:700;display:grid;place-items:center;font-size:14px}
-.steps h3{margin:0 0 4px;font-size:16px}
-.note{background:var(--warn);color:var(--warnink);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:12px}
-.mono{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
-.banner{background:var(--warn);color:var(--warnink);font-size:13px;padding:6px 0;text-align:center}
-main{padding:20px 0 48px}
-h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 10px}
-.crumb{font-size:13px;color:var(--sub);margin-bottom:8px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--c-bg);color:var(--c-ink);font:16px/1.75 var(--font);letter-spacing:.02em}
+a{color:var(--c-base-deep);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:transparent}
+a:hover{text-decoration-color:var(--c-base)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--c-base-deep);outline-offset:3px;border-radius:6px}
+.num,.big,.chg,td.r{font-family:var(--font-num);font-variant-numeric:tabular-nums;letter-spacing:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+@media(min-width:900px){.wrap{padding:0 24px}}
+/* header + footer */
+header{background:var(--c-base);position:relative}
+header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:8px 16px;flex-wrap:wrap;padding-block:6px}
+.logo{font-size:20px;font-weight:800;color:var(--c-ink);text-decoration:none}
+.logo .badge{display:inline-block;margin-left:8px;padding:0 10px;background:#fff;border-radius:var(--r-pill);font-size:10px;font-weight:700;vertical-align:middle;color:var(--c-base-deep)}
+nav{display:flex;align-items:center;flex-wrap:wrap;gap:4px 18px}
+nav a{color:var(--c-ink);font-size:14px;font-weight:700;text-decoration:none;padding:6px 2px}
+nav a:hover{text-decoration:underline;text-decoration-color:#fff}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:radial-gradient(circle at 10px 0,var(--c-base) 10px,transparent 10.5px) 0 0/20px 10px repeat-x}
+.banner{background:transparent;color:var(--c-ink-sub);font-size:12px;padding:16px 0 0;text-align:center}
+main{padding:12px 0 56px;min-height:60vh}
+footer{background:var(--c-foot);position:relative;margin-top:40px;padding:48px 0 32px;color:#5b5648;font-size:13px}
+footer::before{content:"";position:absolute;left:0;right:0;top:-9px;height:10px;background:radial-gradient(circle at 10px 10px,var(--c-foot) 10px,transparent 10.5px) 0 0/20px 10px repeat-x}
+footer a{color:#4a4538}
+.fcols{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:20px}.fcols ul.two{display:block;columns:2}
+.fcols h3{font-size:14px;margin:0 0 6px}.fcols ul{list-style:none;margin:0;padding:0}.fcols li{margin:2px 0}
+/* headings */
+h1{font-size:26px;line-height:1.4;margin:6px 0 14px;font-weight:700}
+h1::after{content:"";display:block;width:48px;height:6px;border-radius:var(--r-pill);background:var(--c-base);margin-top:8px}
+@media(min-width:900px){h1{font-size:32px}}
+h2{margin:40px 0 14px;font-size:18px}
+h2.ribbon,.ribbon{display:inline-flex;align-items:center;gap:8px;padding:6px 18px 6px 14px;background:var(--c-base-pale);border-radius:var(--r-pill);font-size:18px;font-weight:700}
+.ribbon::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c-pink)}
+h3{font-size:16px;margin:0 0 4px}
+.crumb{font-size:13px;color:var(--c-ink-sub);margin:10px 0 4px;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
+.crumb a{color:var(--c-ink-sub)}
+.crumb span.sep{margin:0 6px}
+.meta{font-size:12px;color:var(--c-ink-sub)}
+.dots{border:0;border-top:3px dotted var(--c-line);margin:32px 0}
+/* panels */
+.panel{background:var(--c-surface);border:var(--border);border-radius:var(--r-l);padding:20px;box-shadow:var(--sh-sticker);overflow-x:auto}
+@media(min-width:900px){.panel{padding:28px}}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.two{display:grid;gap:20px;grid-template-columns:1fr 1fr}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
 .hero{display:flex;flex-wrap:wrap;gap:20px;align-items:baseline;margin-bottom:8px}
-.big{font-size:40px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.chg{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
-.up{color:var(--up)}.down{color:var(--down)}
-.meta{font-size:12px;color:var(--sub)}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-.cat{display:block;color:var(--ink)}.cat:hover{text-decoration:none;border-color:var(--accent)}
-.cat .n{font-weight:600}
-.two{display:grid;gap:16px;grid-template-columns:1fr 1fr}
-@media(max-width:720px){.two{grid-template-columns:1fr}.big{font-size:32px}nav a{font-size:13px}}
-table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
-th{font-size:12px;color:var(--sub);font-weight:600}
-td.r,th.r{text-align:right}
-.btn{display:inline-block;border:1px solid var(--accent);border-radius:8px;padding:2px 10px;font-size:13px}
-.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:3px 12px;margin-right:6px;cursor:pointer;font-size:13px}
-.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.chartbox{position:relative}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:3px 8px;border-radius:6px;display:none;white-space:nowrap}
-.nm{display:flex;align-items:center;gap:10px}
-.cimg{border-radius:4px;object-fit:cover;background:var(--line);flex:none}
-.cimg.xs,.cbadge.xs{width:28px;height:39px}
-.cimg.s,.cbadge.s{width:40px;height:56px}
-.cimg.l,.cbadge.l{width:112px;height:157px;border-radius:8px}
-.cbadge{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;flex:none;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--sub);line-height:1.15;text-align:center;overflow:hidden}
-.cbadge b{font-size:11px;color:var(--ink);font-variant-numeric:tabular-nums}
-.cbadge i{font-size:9px;font-style:normal}
-.cbadge.l{border-radius:8px}.cbadge.l b{font-size:22px}.cbadge.l i{font-size:13px}
-.cbadge.xs b{font-size:9px}.cbadge.xs i{font-size:7px}
-.cardhead{display:flex;gap:16px;align-items:flex-start;margin-bottom:6px}
-.cardhead h1{margin-top:2px}
-.yen{color:var(--sub);font-size:.88em;font-variant-numeric:tabular-nums}
-.info{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--sub);color:var(--sub);background:none;font:italic 700 10px/1 Georgia,serif;margin-left:4px;padding:0;cursor:pointer;vertical-align:middle}
-.info:hover,.info:focus-visible{color:var(--accent);border-color:var(--accent)}
-.pop{position:fixed;z-index:50;max-width:250px;background:var(--ink);color:var(--bg);border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-.pop[hidden]{display:none}
-.pill{display:inline-block;background:var(--warn);color:var(--warnink);border-radius:999px;padding:1px 10px;font-size:12px;margin:2px 0}
-.empty{color:var(--sub);font-size:13px;padding:14px 4px}
-.flinks{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:8px;font-size:13px}
-footer{color:var(--sub);font-size:12px;padding:24px 0;border-top:1px solid var(--line)}
-.cta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.big{font-size:38px;font-weight:800;line-height:1.2}
+.chg{font-size:18px;font-weight:700}
+.up{color:var(--c-up)}.down{color:var(--c-down)}.flat{color:var(--c-flat)}
+.empty{background:var(--c-base-pale);color:var(--c-ink-sub);border-radius:var(--r-m);padding:18px;font-size:14px;text-align:center}
+.pill{display:inline-block;background:var(--c-warn);color:var(--c-warn-ink);border-radius:var(--r-pill);padding:1px 10px;font-size:12px;margin:2px 4px 2px 0}
+.note{background:var(--c-warn);color:var(--c-warn-ink);border-radius:var(--r-m);padding:10px 14px;font-size:13px;margin-top:12px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--c-base-pale);border-radius:6px;padding:1px 6px;font-size:13px}
 ul.plain{padding-left:20px;margin:6px 0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.steps>li{counter-increment:s;background:var(--c-surface);border:var(--border);border-radius:var(--r-m);padding:14px 16px 14px 56px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:14px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--c-cta);color:var(--c-ink);font-weight:800;display:grid;place-items:center}
+/* buttons, chips, segments */
+.btn{display:inline-block;border:2px solid var(--c-base);background:#fff;color:var(--c-base-deep);border-radius:var(--r-pill);padding:8px 20px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 3px 0 #D5ECF0;cursor:pointer}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 0 #BFE3EA}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #D5ECF0}
+.btn.primary{background:var(--c-cta);border-color:var(--c-cta);color:var(--c-ink);box-shadow:0 3px 0 var(--c-cta-shadow)}
+.seg{display:inline-flex;background:var(--c-base-pale);border-radius:var(--r-pill);padding:4px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--c-ink);border-radius:var(--r-pill);padding:6px 14px;font:inherit;font-size:13px;cursor:pointer;min-height:36px}
+.seg button.on{background:#fff;font-weight:800;box-shadow:0 2px 0 #BFE3EA}
+.chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+@media(min-width:600px){.chips{display:flex;flex-wrap:wrap}}
+.chip{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r-m);padding:6px 14px;font-size:13px;font-weight:700;text-align:center;line-height:1.35}
+@media(min-width:600px){.chip{flex-direction:row;gap:8px;border-radius:var(--r-pill);min-height:32px;padding:4px 14px}}
+.chip.up{background:var(--c-up-bg);color:var(--c-up)}.chip.down{background:var(--c-down-bg);color:var(--c-down)}.chip.flat{background:var(--c-flat-bg);color:var(--c-flat)}
+.chip small{font-weight:400;opacity:.85}
+details.more{margin-top:14px;border-top:3px dotted var(--c-line);padding-top:10px}
+details.more summary{cursor:pointer;font-weight:700;color:var(--c-base-deep);font-size:14px}
+/* chart */
+.cbox{position:relative;margin-top:8px}
+.cbox svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.tipband{min-height:26px;font-size:13px;font-weight:700;color:var(--c-ink);background:var(--c-base-pale);border-radius:var(--r-s);padding:3px 10px;margin-bottom:6px}
+.headline{font-size:20px;font-weight:700;line-height:1.5;margin:4px 0 2px}
+@media(min-width:900px){.headline{font-size:24px}}
+/* tiles */
+.card-grid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:600px){.card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:20px}}
+.tile{position:relative;display:flex;flex-direction:column;background:var(--c-surface);border:var(--border);border-radius:var(--r-l);padding:10px;box-shadow:var(--sh-sticker);transition:transform .15s,box-shadow .15s,border-color .15s;min-width:0}
+@media(min-width:900px){.tile{padding:12px}}
+.tile.refc{border:2px dashed #E3D6C2}
+.tile-img{position:relative;aspect-ratio:1/1.2;background:#F2FAFB;border-radius:var(--r-m);display:grid;place-items:center;overflow:hidden}
+.tile-img img{height:92%;width:auto;max-width:92%;object-fit:contain}
+.ph{width:62%;aspect-ratio:63/88;border:2px dashed #BFE3EA;border-radius:8px;background:repeating-linear-gradient(45deg,#F2FAFB 0 8px,#E4F4F7 8px 16px);display:grid;place-items:center;text-align:center;font-size:11px;color:var(--c-ink-sub);padding:4px;line-height:1.3}
+.tile .badges{position:absolute;left:6px;top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.bdg{font-size:10px;font-weight:700;border-radius:var(--r-pill);padding:1px 8px;background:var(--c-flat-bg);color:#4d5560}
+.bdg.ref{background:var(--c-foot);color:#6B5E4A}.bdg.first{background:var(--c-warn);color:var(--c-warn-ink)}
+.tile-name{font-size:14px;font-weight:700;line-height:1.4;margin:10px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile-name a{color:var(--c-ink);text-decoration:none}
+.tile-name a::after{content:"";position:absolute;inset:0;border-radius:var(--r-l)}
+.tile-sub{font-size:12px;color:var(--c-ink-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile-price{font-size:18px;font-weight:800;margin-top:6px;line-height:1.3}
+@media(min-width:900px){.tile-price{font-size:20px}}
+.tile-price small{display:block;font-size:12px;font-weight:400;color:var(--c-ink-sub)}
+.tile-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;min-height:26px}
+.mini{display:inline-block;border-radius:var(--r-pill);padding:1px 8px;font-size:11px;font-weight:800}
+.mini.up{background:var(--c-up-bg);color:var(--c-up)}.mini.down{background:var(--c-down-bg);color:var(--c-down)}.mini.flat{background:var(--c-flat-bg);color:var(--c-flat)}
+.tile-illus{position:relative;z-index:1;font-size:12px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tile:hover{transform:translateY(-2px);box-shadow:var(--sh-hover);border-color:var(--c-base)}
+.tile:has(.tile-name a:focus-visible){outline:3px solid var(--c-base-deep);outline-offset:3px}
+.tile:active{transform:translateY(1px);box-shadow:0 1px 0 #D5ECF0}
+@media(prefers-reduced-motion:reduce){.tile,.btn{transition:none}.tile:hover,.btn:hover{transform:none}html{scroll-behavior:auto}}
+.cat{display:block;color:var(--c-ink);text-decoration:none;padding:16px 18px}
+.cat:hover{border-color:var(--c-base);transform:translateY(-2px);box-shadow:var(--sh-hover)}
+.cat .n{font-weight:800;font-size:17px}
+.cat .row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:10px}
+/* az illustrator index */
+.az{display:grid;grid-template-columns:44px 1fr;gap:8px 12px;align-items:start}
+.az .l{width:36px;height:36px;border-radius:50%;background:var(--c-base);color:var(--c-ink);font-weight:800;display:grid;place-items:center;font-size:16px}
+.az .names{display:flex;flex-wrap:wrap;gap:6px 8px;padding:4px 0 10px;border-bottom:2px dotted var(--c-line)}
+.chipl{display:inline-block;padding:2px 12px;border:2px solid var(--c-base-pale);background:#fff;border-radius:var(--r-pill);font-size:14px;text-decoration:none;color:var(--c-ink)}
+.chipl:hover{border-color:var(--c-base);transform:scale(1.04)}
+.chipl small{color:var(--c-ink-sub);margin-left:4px}
+/* card page */
+.cardhead{display:flex;gap:16px;align-items:flex-start;margin-bottom:6px}
+.cimg{border-radius:8px;object-fit:cover;background:var(--c-base-pale);flex:none;width:132px;height:185px}
+.cbadge{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:132px;height:185px;border:2px dashed #BFE3EA;border-radius:8px;background:#F2FAFB;flex:none}
+.cbadge b{font-size:24px}.cbadge i{font-size:13px;font-style:normal;color:var(--c-ink-sub)}
+.yen{color:var(--c-ink-sub);font-size:.88em}
+.info{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--c-ink-sub);color:var(--c-ink-sub);background:none;font:italic 700 10px/1 serif;cursor:pointer;margin-left:4px;padding:0;vertical-align:middle}
+.pop{position:fixed;z-index:50;max-width:250px;background:var(--c-ink);color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.pop[hidden]{display:none}
+.ebaybox{background:#fff;border:2px solid #E6E6E6;border-radius:8px;padding:14px;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--c-line);text-align:left}
+th{font-size:12px;color:var(--c-ink-sub);font-weight:700}td.r,th.r{text-align:right}
+.related{display:grid;gap:14px}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 18px}
+.cta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.softhero{position:relative;overflow:hidden;border-radius:var(--r-l);padding:20px 4px 4px}
+.softhero::before{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:#E4F4F7;opacity:.7;z-index:-1}
+.softhero::after{content:"";position:absolute;left:-30px;bottom:-50px;width:140px;height:140px;border-radius:50%;background:#FDEFF2;opacity:.8;z-index:-1}
+/* back to top */
+#totop{position:fixed;right:16px;bottom:20px;width:48px;height:48px;border-radius:50%;border:0;background:var(--c-cta);color:var(--c-ink);font-size:20px;font-weight:800;box-shadow:0 3px 0 var(--c-cta-shadow),0 6px 16px rgba(59,58,69,.18);cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s;z-index:40}
+#totop.show{opacity:1;pointer-events:auto;transform:none}
+#totop:active{transform:translateY(2px)}
+.skel{background:linear-gradient(90deg,#E4F4F7,#F2FAFB,#E4F4F7);background-size:200% 100%;animation:sk 1.4s linear infinite;border-radius:var(--r-m);min-height:80px}
+@keyframes sk{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.skel{animation:none}#totop{transition:none}}
+.sr{position:absolute;left:-9999px}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <a class="logo" href="#/">PSA ポケカ指数 <span class="meta">JP × eBay</span></a>
-  <nav><a href="#/about">指数の算出方法</a><a class="guide" href="#/guide">日本からeBayで買い物できるの？</a></nav>
+  <a class="logo" href="/" data-home>PSAポケカ指数<span class="badge">毎日更新</span></a>
+  <nav aria-label="メイン"><a href="/" data-nav="series">シリーズ</a><a href="/" data-nav="illust">イラストレーター</a><a href="/" data-nav="guide">つかいかた</a></nav>
 </div></header>
-<div class="banner">試験運用中 — 価格は、eBay の出品情報をもとに、毎日1回算出しています。</div>
-<main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap">
-  <div class="flinks"><a href="#/source">データの出典</a><a href="#/terms">利用規約・免責</a><a href="#/privacy">プライバシーポリシー</a></div>
-  価格データの出典: eBay(出品情報)。本サイトは eBay Inc. とは無関係の非公式サイトです。投資助言ではありません。
-</div></footer>
-
+<div class="banner" id="banner">試験運用中 — 価格は、eBay の出品情報をもとに、毎日1回算出しています。</div>
+<main><div class="wrap" id="app"><!--SSR--></div></main>
+<footer><div class="wrap" id="foot"></div></footer>
+<button id="totop" type="button" aria-label="ページの先頭へ戻る">↑</button>
 <script src="data/latest.js"></script>
 <script>
 const GA_ID = 'G-6X43R1P4MT';
-const EPN_CAMPID = '5339221531';   // eBay Partner Network campaign ID (affiliate links are off while empty)   // Google Analytics 4 measurement ID (G-XXXXXXXXXX); empty = no analytics
+const EPN_CAMPID = '5339221531';   // eBay Partner Network campaign ID (affiliate links are off while empty)
 const D = window.PSA_DATA;
+const SERVER = !!window.PSA_SERVER;     // the server version has real URLs; the static version keeps hash URLs
+const SITE_NAME = 'PSAポケカ指数';
+const IMG = p => p ? (SERVER ? '/'+p : p) : p;
 if(GA_ID){const g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;document.head.appendChild(g);
   window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA_ID,{send_page_view:false});}
 const track=(name,params)=>{if(GA_ID&&window.gtag)gtag('event',name,params)};
-const state = {range:0, metric:'index', cm:null};
+const state = {range:90, metric:'index', cm:null, sort:'price', shown:60};
 const el = id => document.getElementById(id);
+const esc = t => String(t==null?'':t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+// ---------- urls ----------
+const SLUG={'sr-kyuura':'kyuura','sr-e':'card-e','sr-adv':'adv','sr-pcg':'pcg','sr-dp':'dp','sr-dpt':'dpt','sr-legend':'legend','sr-bw':'bw','sr-xy':'xy','sr-sm':'sm','ref':'reference'};
+const slugOf=id=>SLUG[id]||id;
+const idOfSlug=s=>Object.keys(SLUG).find(k=>SLUG[k]===s)||s;
+const nslug=n=>String(n).normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const P={
+  top:()=>SERVER?'/':'#/', seriesIndex:()=>SERVER?'/series/':'#/',
+  series:id=>SERVER?`/series/${slugOf(id)}/`:`#/category/${id}`,
+  card:id=>SERVER?`/cards/${id}/`:`#/card/${id}`,
+  illust:n=>SERVER?`/illustrators/${nslug(n)}/`:`#/illust/${encodeURIComponent(n)}`,
+  illustIndex:()=>SERVER?'/illustrators/':'#/illustrators',
+  guide:()=>SERVER?'/guide/':'#/guide', about:()=>SERVER?'/about/':'#/about', privacy:()=>SERVER?'/privacy/':'#/privacy',
+  terms:()=>SERVER?'/terms/':'#/terms', source:()=>SERVER?'/source/':'#/source',
+};
+const ABS=p=>(window.PSA_ORIGIN||location.origin)+(SERVER?p:'/'+p.replace(/^#\/?/,''));
+function parseRoute(){
+  if(SERVER){
+    const seg=location.pathname.split('/').filter(Boolean);
+    if(!seg.length)return{page:'top'};
+    if(seg[0]==='series')return seg[1]?{page:'series',id:idOfSlug(seg[1])}:{page:'top',anchor:'series'};
+    if(seg[0]==='cards'&&seg[1])return{page:'card',id:seg[1]};
+    if(seg[0]==='illustrators')return seg[1]?{page:'illust',slug:seg[1]}:{page:'illustIndex'};
+    if(['guide','about','privacy','terms','source'].includes(seg[0]))return{page:seg[0]};
+    return{page:'notfound'};
+  }
+  const h=location.hash.replace(/^#\/?/,'').split('/');
+  if(!h[0])return{page:'top'};
+  if(h[0]==='category')return{page:'series',id:h[1]};
+  if(h[0]==='card')return{page:'card',id:h[1]};
+  if(h[0]==='illust')return{page:'illust',name:decodeURIComponent(h[1]||'')};
+  if(h[0]==='illustrators')return{page:'illustIndex'};
+  if(['guide','about','privacy','terms','source'].includes(h[0]))return{page:h[0]};
+  return{page:'notfound'};
+}
 // ---------- helpers ----------
 const usd = v => v==null?'—':'$'+v.toLocaleString('en-US',{maximumFractionDigits:2});
 const jpy = v => v==null?'—':'¥'+Math.round(v*D.usd_jpy).toLocaleString('ja-JP');
+const man = v => v==null?'':(v*D.usd_jpy>=10000?'約'+(v*D.usd_jpy/10000).toFixed(1)+'万円':'約'+Math.round(v*D.usd_jpy).toLocaleString('ja-JP')+'円');
 const FXNAME={ecb:'欧州中央銀行(ECB)参照レート',frankfurter:'欧州中央銀行(ECB)参照レート',carried_forward:'前回取得したレート(ECB)',mock:'テスト用レート'};
 const fxText=()=>{const [k,d]=(D.usd_jpy_src||'').split(':');return `1ドル = ${D.usd_jpy.toFixed(2)}円<br>出典: ${FXNAME[k]||'為替レート'}${d?`(${d} 公表)`:''}<br>円換算は目安です。`};
 const infoBtn='<button type="button" class="info" aria-label="為替の情報">i</button>';
 const yenInfo = v => v==null?'':`<span class="yen">(${jpy(v)})</span>${infoBtn}`;
 const ud = v => `${usd(v)} ${yenInfo(v)}`;
-const pctTxt = r => r==null?'—':`${r>=0?'+':''}${(r*100).toFixed(2)}%`;
-const cls = r => r==null?'':(r>=0?'up':'down');
-const jst = iso => new Date(iso).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+const pctTxt = r => r==null?'—':`${r>=0?'+':'−'}${Math.abs(r*100).toFixed(1)}%`;
+const dirOf = (r,th=0.01) => r==null?'flat':(r>=th?'up':(r<=-th?'down':'flat'));
+const cls = r => r==null?'':dirOf(r,0);
+const arrow = d => d==='up'?'▲':(d==='down'?'▼':'→');
+const jst = iso => new Date(iso).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const epn = (url,custom) => EPN_CAMPID ? url+(url.includes('?')?'&':'?')+'mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid='+EPN_CAMPID+'&customid='+encodeURIComponent(custom||'')+'&toolid=10001&mkevt=1' : url;
 const relEbay = EPN_CAMPID ? 'sponsored nofollow noopener' : 'noopener';
 const ebayUrl = (c,id) => epn('https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent('PSA 10 '+c.query)+'&LH_BIN=1', id);
-if(EPN_CAMPID){const bn=document.querySelector&&document.querySelector('.banner');if(bn)bn.innerHTML+=' ／ <strong>PR</strong> eBay へのリンクには、アフィリエイト広告が含まれます。';}
+if(EPN_CAMPID){const bn=document.getElementById('banner');if(bn)bn.innerHTML+=' ／ <strong>PR</strong> eBay へのリンクには、アフィリエイト広告が含まれます。';}
 const FLAG = {anchor:'日本の相場をもとにした参考値(米国の出品が少ないため)', thin:'出品が少ない(日本の相場も加味した参考値)', held:'保留中(急な変動を確認中)', no_data:'データ不足(前日の値を表示)', confirmed_move:'急な変動を確認済み'};
 const flagPill = f => FLAG[f]?`<span class="pill">${FLAG[f]}</span>`:'';
-const last2 = h => h.length>=2?[h[h.length-2][1],h[h.length-1][1]]:null;
-const dod = c => {const l=last2(c.history);return l&&l[0]?l[1]/l[0]-1:null};
-const dodL = c => {const l=last2(c.lowest_history||[]);return l&&l[0]?l[1]/l[0]-1:null};
-const sliceH = a => state.range&&a.length>state.range?a.slice(-state.range):a;
-
-function chart(points, fmt, fine){ // points: [[label, value]]
-  if(points.length<2) return `<div class="empty">グラフは、2日分以上のデータがそろってから表示されます。(現在 ${points.length} 日分)</div>`;
-  const W=720,H=240,P={l:52,r:10,t:10,b:22},n=points.length,vals=points.map(p=>p[1]);
-  const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||Math.abs(mx)*0.02||1,lo=mn-pad,hi=mx+pad;
-  const X=i=>P.l+(W-P.l-P.r)*i/(n-1),Y=v=>P.t+(H-P.t-P.b)*(1-(v-lo)/(hi-lo));
-  let g='';
-  const tv=[0,1,2,3,4].map(k=>lo+(hi-lo)*k/4);
-  let tf=fmt;if(new Set(tv.map(fmt)).size<5)tf=fine||(v=>v.toFixed(2));
-  tv.forEach(v=>{const y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--sub)">${tf(v)}</text>`});
-  [...new Set(n<=3?[...Array(n).keys()]:[0,Math.round((n-1)/2),n-1])].forEach(i=>{g+=`<text x="${X(i)}" y="${H-5}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="11" fill="var(--sub)">${points[i][0].slice(5)}</text>`});
-  const line=`<polyline fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" points="${points.map((p,i)=>X(i).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')}"/>`;
-  const id='c'+Math.random().toString(36).slice(2,8);
-  setTimeout(()=>{const box=el(id);if(!box)return;const svg=box.querySelector('svg'),tip=box.querySelector('.tip');
-    svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W;const i=Math.max(0,Math.min(n-1,Math.round((x-P.l)/(W-P.l-P.r)*(n-1))));
-      tip.style.display='block';tip.style.left=(X(i)/W*r.width+8)+'px';tip.style.top='6px';tip.textContent=`${points[i][0]}  ${fmt(points[i][1])}`});
-    svg.addEventListener('mouseleave',()=>tip.style.display='none')},0);
-  return `<div class="chartbox" id="${id}"><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="推移グラフ">${g}${line}</svg><div class="tip"></div></div>`;
-}
-function rangeTabs(){return `<div class="tabs" style="margin:6px 0 8px">${[[30,'30日'],[90,'90日'],[0,'全期間']].map(([d,t])=>`<button data-r="${d}" class="${state.range===d?'on':''}">${t}</button>`).join('')}</div>`}
-function metricTabs(){return `<div class="tabs" style="margin:6px 0 8px">${[['index','指数'],['mean','平均価格($)'],['price','バスケット価格($)']].map(([m,t])=>`<button data-m="${m}" class="${state.metric===m?'on':''}">${t}</button>`).join('')}</div>`}
-
-function basketBlock(b,note){
-  const key=state.metric==='index'?'index':state.metric==='price'?'total_usd':'mean_usd';
-  const pts=sliceH(b.history).map(h=>[h.date,h[key]]);
-  const ch=b.change;
-  const cell=(t,r)=>`<div><div class="meta">${t}</div><div class="chg ${cls(r)}">${pctTxt(r)}</div></div>`;
-  return `<div class="panel">
-    <div class="hero"><div><div class="meta">指数(基準日 = 100)</div><div class="big">${b.index.toFixed(2)}</div></div></div>
-    <div class="hero" style="gap:24px;margin-bottom:4px">${cell('前日比',ch['1d'])}${cell('7日',ch['7d'])}${cell('30日',ch['30d'])}${cell('90日',ch['90d'])}</div>
-    <div class="meta">${note||''}</div>
-    <div class="meta" style="margin-top:6px">参考(実際の価格): 1枚あたりの平均 ${ud(b.mean_usd)} ／ 中央値 ${ud(b.median_usd)} ／ バスケット価格(${b.n_cards}枚の合計) ${ud(b.total_usd)}</div>
-    ${metricTabs()}${b.history.length>30?rangeTabs():''}
-    ${chart(pts,state.metric==='index'?v=>v.toFixed(1):v=>'$'+Math.round(v).toLocaleString('en-US'),state.metric==='index'?v=>v.toFixed(3):v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
-  </div>`;
-}
-function thumb(c,size){
-  if(c.image) return `<img class="cimg ${size}" src="${c.image}" alt="${c.name_jp}" loading="lazy">`;
-  return `<span class="cbadge ${size}"><b>${c.number.split('/')[0]}</b><i>${c.set_code||(c.number.split('/')[1]||'')}</i></span>`;
-}
 const COMPANY=/Graphics|gangs|Art-team|Project/i;
 const SR_NAME=['旧裏','カードe','ADV','PCG','DP','DPt','LEGEND','BW','XY','サン＆ムーン'];
+const SR_FULL=['旧裏(1996〜2001年)','カードe(2001〜2003年)','ADV(2003〜2005年)','PCG(2005〜2006年)','DP(2006〜2008年)','DPt(2008〜2009年)','LEGEND(2009〜2010年)','BW(2010〜2013年)','XY(2013〜2016年)','サン＆ムーン(2016〜2019年)'];
 function illusNames(c){return (c.illustrator||'').split(' / ').map(x=>x.trim()).filter(x=>x&&!/^Direc\.?/i.test(x))}
-function illusLinks(c){return illusNames(c).map(n=>`<a href="#/illust/${encodeURIComponent(n)}">${n.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}</a>`).join(' / ')}
-const illusLine=c=>illusNames(c).length?`<div class="meta">Illus.${illusLinks(c)}</div>`:'';
-function cardTable(ids,ordered){
-  const rows=ids.map(id=>[id,D.cards[id]]).sort(ordered?((a,b)=>String(a[1].set).localeCompare(String(b[1].set))||String(a[1].number).localeCompare(String(b[1].number))):((a,b)=>(b[1].price_usd||0)-(a[1].price_usd||0)));
-  return `<table><thead><tr><th>カード</th><th class="r">最安値(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}${illusLine(c)}</div></div></td><td class="r">${c.lowest_usd!=null?ud(c.lowest_usd):'—'}<div class="meta">中央値 ${usd(c.price_usd)}</div></td><td class="r ${cls(dodL(c))}">${pctTxt(dodL(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
+const illusLinks=c=>illusNames(c).map(n=>`<a href="${P.illust(n)}">${esc(n)}</a>`).join(' / ');
+const ILLUS={};Object.values(D.cards).forEach(c=>illusNames(c).forEach(n=>{ILLUS[nslug(n)]=n}));
+const who=n=>COMPANY.test(n)?n:n+'先生';
+// history helpers: [[date,value],...]
+const daysAgoIdx=(h,d)=>{if(h.length<2)return -1;const last=new Date(h[h.length-1][0]);for(let i=0;i<h.length;i++){if((last-new Date(h[i][0]))/864e5<=d)return i}return -1};
+const histDays=h=>h.length<2?0:Math.round((new Date(h[h.length-1][0])-new Date(h[0][0]))/864e5);
+// change over the last d days; null while the history is shorter than 60% of d (so "3か月" is not shown from 4 days of data)
+const pctOver=(h,d)=>{if(histDays(h)<d*0.6)return null;const i=daysAgoIdx(h,d);if(i<0||i>=h.length-1)return null;const a=h[i][1],b=h[h.length-1][1];return a?b/a-1:null};
+// the best available recent change: 28 days when there is that much history, else the whole history (at least 2 days)
+const pctBest=h=>{const s=histDays(h);if(s>=17)return{r:pctOver(h,28),label:'1か月'};if(s>=2&&h[0][1])return{r:h[h.length-1][1]/h[0][1]-1,label:s+'日間'};return{r:null,label:'1か月'}};
+const priceHist=c=>c.history||[];
+// ---------- sparkline ----------
+function spark(vals,{w=80,h=24,sw=1.75,dot=4}={}){
+  const label=(t)=>`aria-hidden="true"`;
+  const v=vals.filter(x=>x!=null);
+  if(v.length<7)return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" ${label()}><line x1="3" x2="${w-3}" y1="${h/2}" y2="${h/2}" stroke="var(--c-flat-line)" stroke-width="${sw}" stroke-dasharray="2 3" stroke-linecap="round"/></svg>`;
+  const first=v[0],last=v[v.length-1],r=first?last/first-1:0,d=dirOf(r,0.01);
+  let mn=Math.min(...v),mx=Math.max(...v);const mean=v.reduce((a,b)=>a+b,0)/v.length;
+  if(mx-mn<mean*0.02){const m=(mx+mn)/2;mn=m-mean*0.01;mx=m+mean*0.01}
+  const pad=3,X=i=>pad+(w-2*pad-(d==='down'?6:0))*i/(v.length-1),Y=x=>pad+(h-2*pad)*(1-(x-mn)/(mx-mn));
+  const col=`var(--c-${d}-line)`;
+  const pts=v.map((x,i)=>X(i).toFixed(1)+','+Y(x).toFixed(1)).join(' ');
+  const ex=X(v.length-1),ey=Y(last);
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" ${label()}><polyline fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/><circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="${dot/2}" fill="${col}"/>${d==='down'?`<path d="M${(ex+5).toFixed(1)},${(ey-2).toFixed(1)} l4,0 l-2,4 z" fill="${col}"/>`:''}</svg>`;
 }
-function movers(){
-  const rows=Object.entries(D.cards).filter(([,c])=>c.flag==='ok'&&dod(c)!=null).map(([id,c])=>[id,c,dod(c)]).sort((a,b)=>b[2]-a[2]);
-  if(!rows.length) return `<h2>前日から動いたカード</h2><div class="panel empty">前日比は、2日分のデータがそろった翌日から表示されます。</div>`;
-  const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><div class="nm">${thumb(c,"xs")}<div><a href="#/card/${id}">${c.name_jp}</a>${illusLine(c)}</div></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
-  return `<div class="two"><div><h2>前日から上がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]>0).slice(0,10))}</div></div><div><h2>前日から下がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]<0).slice(-10).reverse())}</div></div></div>`;
+const last28=(h,key)=>{const i=Math.max(0,daysAgoIdx(h,28));return h.slice(i).map(x=>Array.isArray(x)?x[1]:x[key])};
+// ---------- charts ----------
+const CHARTS=[];
+function niceRange(mn,mx){const pad=(mx-mn)*0.12||Math.abs(mx)*0.02||1;return[mn-pad,mx+pad]}
+function areaChart(points,{fmt,tipFmt,baseline,baseLabel,aria,id}){
+  // points: [[date,value]]
+  if(points.length<2)return `<div class="empty">まだデータを集めているところです。2日分以上そろうと、グラフが見られます。(いま ${points.length} 日分)</div>`;
+  const W=720,H=240,Pd={l:8,r:64,t:16,b:26},n=points.length,vals=points.map(p=>p[1]);
+  const [lo,hi]=niceRange(Math.min(...vals),Math.max(...vals));
+  const X=i=>Pd.l+(W-Pd.l-Pd.r)*i/(n-1),Y=v=>Pd.t+(H-Pd.t-Pd.b)*(1-(v-lo)/(hi-lo));
+  let g='';
+  [lo+(hi-lo)*0.1,(lo+hi)/2,hi-(hi-lo)*0.1].forEach(v=>{const y=Y(v);g+=`<line x1="${Pd.l}" x2="${W-Pd.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E4F4F7" stroke-dasharray="3 4"/><text x="${W-Pd.r+6}" y="${(y+4).toFixed(1)}" font-size="12" fill="#6B6F7A">${fmt(v)}</text>`});
+  if(baseline!=null&&baseline>lo&&baseline<hi){const y=Y(baseline);g+=`<line x1="${Pd.l}" x2="${W-Pd.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#F7B9C4" stroke-width="1.5" stroke-dasharray="6 4"/><text x="${Pd.l+2}" y="${(y-5).toFixed(1)}" font-size="11" fill="#b5707f">${baseLabel||''}</text>`}
+  const md=s=>{const d=new Date(s);return (d.getMonth()+1)+'/'+d.getDate()};
+  [[0,'start'],[Math.round((n-1)/2),'middle'],[n-1,'end']].forEach(([i,a])=>{if(n<3&&i===1)return;g+=`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="${a}" font-size="12" fill="#6B6F7A">${md(points[i][0])}</text>`});
+  const pts=points.map((p,i)=>X(i).toFixed(1)+','+Y(p[1]).toFixed(1));
+  const gid='g'+Math.random().toString(36).slice(2,7);
+  const area=`<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8CD0DC" stop-opacity=".45"/><stop offset="1" stop-color="#8CD0DC" stop-opacity="0"/></linearGradient></defs><polygon fill="url(#${gid})" points="${X(0).toFixed(1)},${H-Pd.b} ${pts.join(' ')} ${X(n-1).toFixed(1)},${H-Pd.b}"/>`;
+  const line=`<polyline fill="none" stroke="#1D6F80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts.join(' ')}"/>`;
+  const lx=X(n-1),ly=Y(vals[n-1]);
+  const mi=vals.indexOf(Math.min(...vals)),ma=vals.indexOf(Math.max(...vals));
+  let marks='';
+  [[ma,'さいこう'],[mi,'さいてい']].forEach(([i,t])=>{if(i<n*0.12||i>=n-3||Math.abs(i-(n-1))<n*0.08)return;if(Math.abs(vals[ma]-vals[mi])<1e-9)return;marks+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(vals[i]).toFixed(1)}" r="3.5" fill="#fff" stroke="#6B6F7A"/><text x="${X(i).toFixed(1)}" y="${(Y(vals[i])+(t==='さいこう'?-9:16)).toFixed(1)}" text-anchor="middle" font-size="11" fill="#6B6F7A">${t} ${fmt(vals[i])}</text>`});
+  const bub=`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="6" fill="#fff" stroke="#1D6F80" stroke-width="3"/>`;
+  id=id||('c'+Math.random().toString(36).slice(2,8));
+  CHARTS.push(()=>{const box=el(id);if(!box)return;const svg=box.querySelector('svg'),tip=box.querySelector('.tipband'),vl=box.querySelector('.vl'),vd=box.querySelector('.vd');
+    const show=e=>{const r=svg.getBoundingClientRect(),x=((e.clientX??e.touches[0].clientX)-r.left)/r.width*W;const i=Math.max(0,Math.min(n-1,Math.round((x-Pd.l)/(W-Pd.l-Pd.r)*(n-1))));
+      vl.setAttribute('x1',X(i));vl.setAttribute('x2',X(i));vl.setAttribute('opacity',1);vd.setAttribute('cx',X(i));vd.setAttribute('cy',Y(vals[i]));vd.setAttribute('opacity',1);
+      const d=new Date(points[i][0]);tip.textContent=`${d.getMonth()+1}月${d.getDate()}日  ${tipFmt(vals[i],points[0][1])}`};
+    svg.addEventListener('pointermove',show);svg.addEventListener('pointerdown',show);
+    svg.addEventListener('pointerleave',()=>{vl.setAttribute('opacity',0);vd.setAttribute('opacity',0);tip.textContent=tip.dataset.def});
+    tip.dataset.def=tip.textContent});
+  const first=points[0][1],lastv=vals[n-1];
+  return `<div class="cbox" id="${id}"><div class="tipband" aria-hidden="true">いま ${tipFmt(lastv,first)}</div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria||'推移のグラフ')}">${g}${area}${line}<line class="vl" x1="0" x2="0" y1="${Pd.t}" y2="${H-Pd.b}" stroke="#8CD0DC" stroke-width="1.5" opacity="0"/><circle class="vd" r="4.5" fill="#1D6F80" opacity="0"/>${marks}${bub}</svg></div>`;
 }
-function ebayCta(){return `<h2>eBay で実際の出品を確認する</h2><div class="panel cta"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="${epn('https://www.ebay.com/','cta')}" target="_blank" rel="${relEbay}">eBay を開く ↗</a></div></div>`}
-
+const RANGES=[[30,'1か月'],[90,'3か月'],[180,'半年'],[0,'すべて']];
+function rangeSeg(){return `<div class="seg" role="radiogroup" aria-label="期間">${RANGES.map(([d,t])=>`<button type="button" role="radio" aria-checked="${state.range===d}" data-r="${d}" class="${state.range===d?'on':''}">${t}</button>`).join('')}</div>`}
+function sliceR(h){const R=state.range;if(!R||h.length<2)return h;const i=daysAgoIdx(h,R);return i<0?h:h.slice(i)}
+function periodLabel(h){const R=state.range,span=histDays(h);if(!R){return span?`これまでの${span}日間`:'これまで'}const t=RANGES.find(x=>x[0]===R)[1];return span<R*0.8?`これまでの${span}日間`:`この${t}`}
+function headlineHtml(label,pct){
+  if(pct==null)return `<div class="headline">${label}の変化は、まだ計算できません</div>`;
+  const a=Math.abs(pct*100);const d=dirOf(pct,0.005);
+  const word=d==='flat'?'ほぼ横ばいです':`${a<3?'少し':(a>=10?'大きく':'')}${d==='up'?'上がっています':'下がっています'}`;
+  return `<div class="headline">${label}は、${d==='flat'?`<span class="flat">${word}</span>`:`<span class="${d}">${arrow(d)} ${a.toFixed(1)}% ${word}</span>`}</div>`;
+}
+function chipsHtml(r7,r30,r90){
+  const chip=(t,r)=>{const d=r==null?'flat':dirOf(r,0.005);return `<span class="chip ${d}"><span>${t}</span><span>${r==null?'まだデータなし':`${arrow(d)} ${pctTxt(r)}`}</span></span>`};
+  return `<div class="chips">${chip('1週間',r7)}${chip('1か月',r30)}${chip('3か月',r90)}</div>`;
+}
+function weeklyTable(points,fmt){const rows=[];for(let i=points.length-1;i>=0&&rows.length<26;i-=7)rows.push(points[i]);return `<table><thead><tr><th>日付</th><th class="r">値</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${p[0]}</td><td class="r">${fmt(p[1])}</td></tr>`).join('')}</tbody></table>`}
+function basketBlock(b,note){
+  const h=b.history.map(x=>[x.date,x.index]);
+  const hs=sliceR(h);
+  const pct=hs.length>1?hs[hs.length-1][1]/hs[0][1]-1:null;
+  const mkey=state.metric,key=mkey==='index'?'index':(mkey==='total'?'total_usd':'mean_usd');
+  const pts=sliceR(b.history.map(x=>[x.date,x[key]]));
+  const fmt=mkey==='index'?v=>v.toFixed(0):v=>'$'+Math.round(v).toLocaleString('en-US');
+  const tipFmt=mkey==='index'?(v,f)=>`指数 ${v.toFixed(1)}(はじめの日から ${pctTxt(v/100-1)})`:(v)=>`${usd(v)}`;
+  const ch=b.change||{};
+  return `<div class="panel">
+    <div class="meta">${esc(b.name)}の相場</div>
+    ${headlineHtml(periodLabel(h),pct)}
+    <div class="meta">いま 指数 <b class="num">${b.index.toFixed(1)}</b>(はじめの日=100)・カード ${b.n_cards}枚</div>
+    ${chipsHtml(ch['7d'],ch['30d'],ch['90d'])}
+    ${areaChart(pts,{fmt,tipFmt,baseline:mkey==='index'?100:null,baseLabel:'はじめの日=100',aria:`${b.name}の${mkey==='index'?'指数':'金額'}のグラフ。${periodLabel(h)}で${pct==null?'':pctTxt(pct)}`})}
+    <div style="margin-top:10px">${b.history.length>30?rangeSeg():''}</div>
+    <details class="more"><summary>くわしく見る</summary>
+      <div class="meta" style="margin:8px 0">見る数字をえらべます。</div>
+      <div class="seg" role="radiogroup" aria-label="数字">${[['index','指数'],['total','合計の金額(ドル)'],['mean','1枚あたりの平均(ドル)']].map(([m,t])=>`<button type="button" role="radio" aria-checked="${mkey===m}" data-m="${m}" class="${mkey===m?'on':''}">${t}</button>`).join('')}</div>
+      <p class="meta" style="margin-top:10px">参考(実際の価格): 1枚あたりの平均 ${ud(b.mean_usd)} ／ 中央値 ${ud(b.median_usd)} ／ ${b.n_cards}枚の合計 ${ud(b.total_usd)}</p>
+      <p class="meta">${note||''}</p>
+      <details style="margin-top:8px"><summary class="meta">表で見る(1週間ごと)</summary>${weeklyTable(pts,fmt)}</details>
+    </details>
+    <p class="meta" style="margin-top:10px">指数は、はじめの日を100として、カードの値段がどれだけ動いたかを表した数字です。<a href="${P.about()}">くわしい説明</a></p>
+  </div>`;
+}
+// ---------- tiles ----------
+function thumbBox(c,id){
+  if(c.image)return `<img src="${esc(IMG(c.image))}" alt="${esc(c.name_jp)}" width="170" height="204" loading="lazy" decoding="async" onerror="this.outerHTML='<div class=ph>${esc(((c.set||'')+' '+(c.number||'')).replace(/['\\\\]/g,''))}</div>'">`;
+  return `<div class="ph">${esc(c.set||'')}<br>${esc(c.number||'')}</div>`;
+}
+function tile(id,c,{showIllus=true}={}){
+  const h=priceHist(c);const pb=pctBest(h),r=pb.r;const d=r==null?'flat':dirOf(r,0.005);
+  const refc=c.reference||c.flag==='thin';
+  const first=/NoRaritySymbol/.test(c.name_jp);
+  const badges=`${c.reference?'<span class="bdg ref">参考</span>':''}${first?'<span class="bdg first">初版</span>':''}${c.dup_of?'<span class="bdg">版違い</span>':''}`;
+  const priceTxt=c.dup_of&&D.cards[c.dup_of]?`<small>価格は ${esc(D.cards[c.dup_of].name_jp)} と同じ</small>`:'';
+  return `<article class="tile${refc?' refc':''}">
+    <div class="tile-img">${thumbBox(c,id)}<div class="badges">${badges}</div></div>
+    <h3 class="tile-name"><a href="${P.card(id)}">${esc(c.name_jp)}</a></h3>
+    <div class="tile-sub">${esc(c.set||'')} · ${esc(c.number||'')}</div>
+    <div class="tile-price num">${c.price_usd!=null?usd(c.price_usd):'—'}<small>${c.price_usd!=null?man(c.price_usd):''}</small>${priceTxt}</div>
+    <div class="tile-row"><span class="mini ${d}">${r==null||c.reference?'1か月 —':`${pb.label} ${arrow(d)}${pctTxt(r)}`}</span>${spark(last28(h),{w:80,h:24})}</div>
+    ${showIllus&&illusNames(c).length?`<span class="tile-illus">Illus.${illusLinks(c)}</span>`:''}
+  </article>`;
+}
+const SORTS=[['price','高い順'],['num','番号順'],['up','上がった順'],['down','下がった順']];
+function sortIds(ids){
+  const a=ids.slice(),r=id=>pctBest(priceHist(D.cards[id])).r;
+  const num=id=>String(D.cards[id].set)+' '+String(D.cards[id].number);
+  if(state.sort==='num')a.sort((x,y)=>num(x).localeCompare(num(y)));
+  else if(state.sort==='up')a.sort((x,y)=>(r(y)??-9)-(r(x)??-9));
+  else if(state.sort==='down')a.sort((x,y)=>(r(x)??9)-(r(y)??9));
+  else a.sort((x,y)=>(D.cards[y].price_usd||0)-(D.cards[x].price_usd||0));
+  return a;
+}
+function cardGrid(ids,{sort=true,limit=0}={}){
+  const all=sort?sortIds(ids):ids,show=limit?all.slice(0,state.shown):all;
+  return `${sort?`<div style="margin-bottom:14px"><div class="seg" role="radiogroup" aria-label="並べ替え">${SORTS.map(([k,t])=>`<button type="button" role="radio" aria-checked="${state.sort===k}" data-sort="${k}" class="${state.sort===k?'on':''}">${t}</button>`).join('')}</div></div>`:''}
+  <div class="card-grid">${show.map(id=>tile(id,D.cards[id])).join('')}</div>
+  ${limit&&all.length>show.length?`<div style="text-align:center;margin-top:18px"><button type="button" class="btn" data-more="1">もっと見る(のこり ${all.length-show.length}枚)</button></div>`:''}`;
+}
+function moverCols(ids,n=5){
+  const rows=ids.map(id=>[id,D.cards[id],pctBest(priceHist(D.cards[id])).r]).filter(r=>r[1].flag==='ok'&&r[2]!=null&&!r[1].reference);
+  const up=rows.filter(r=>r[2]>0).sort((a,b)=>b[2]-a[2]).slice(0,n),dn=rows.filter(r=>r[2]<0).sort((a,b)=>a[2]-b[2]).slice(0,n);
+  return{up,dn};
+}
+function moverList(rows,title,empty){
+  return `<div><h2 class="ribbon" style="margin-top:0">${title}</h2><div style="margin-top:12px">${rows.length?`<div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${rows.map(r=>tile(r[0],r[1])).join('')}</div>`:`<div class="empty">${empty}</div>`}</div></div>`;
+}
+function crumbs(items){ // [[label,href|null],...]
+  return `<nav class="crumb" aria-label="パンくず">${items.map((it,i)=>(i?'<span class="sep">›</span>':'')+(it[1]?`<a href="${it[1]}">${esc(it[0])}</a>`:`<span aria-current="page">${esc(it[0])}</span>`)).join('')}</nav>`;
+}
+// ---------- illustrator index (A-Z) ----------
+function illustCounts(ids){const cnt={};(ids||Object.keys(D.cards)).forEach(id=>illusNames(D.cards[id]).forEach(n=>{cnt[n]=(cnt[n]||0)+1}));return cnt}
+function azIndex(){
+  const cnt=illustCounts(),names=Object.keys(cnt).sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase(),'en'));
+  if(!names.length)return '';
+  const groups={};names.forEach(n=>{const k=/^[A-Za-z]/.test(n)?n[0].toUpperCase():'#';(groups[k]=groups[k]||[]).push(n)});
+  const keys=Object.keys(groups).sort((a,b)=>a==='#'?1:b==='#'?-1:a.localeCompare(b));
+  return `<div class="panel"><div class="az">${keys.map(k=>`<div class="l" id="az-${k==='#'?'other':k}">${k}</div><div class="names">${groups[k].map(n=>`<a class="chipl" href="${P.illust(n)}">${esc(n)}<small>${cnt[n]}</small></a>`).join('')}</div>`).join('')}</div></div>
+  <p class="meta" style="margin-top:8px">カードに印刷されているイラストレーター名を、カード画像から読み取っています(読み取れたカードだけ)。</p>`;
+}
 // ---------- pages ----------
+function ebayCta(){return `<h2 class="ribbon">eBay で実際の出品を確認する</h2><div class="panel cta" style="margin-top:14px"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="${P.guide()}">日本からeBayで買い物できるの？</a></div></div>`}
+function seriesTiles(cats){
+  return `<div class="grid">${cats.map(c=>{
+    const ch=c.change||{};const d=c.reference?'flat':dirOf(ch['30d'],0.005);
+    return `<a class="panel cat" href="${P.series(c.id)}"><div class="n">${esc(c.name)}</div><div class="meta" style="margin-top:2px">${esc(c.description).slice(0,70)}</div>
+      <div class="row"><div>${c.reference?'<span class="meta">指数は出していません</span>':`<div class="meta">1か月</div><div class="chg ${d}">${ch['30d']==null?'—':`${arrow(d)} ${pctTxt(ch['30d'])}`}</div>`}<div class="meta">${c.n_cards}枚${c.reference?'':` ／ 指数 ${c.index.toFixed(1)}`}</div></div>${c.reference?'':spark(last28(c.history.map(x=>[x.date,x.index])),{w:112,h:36,sw:2,dot:5})}</div></a>`}).join('')}</div>`;
+}
 function pageTop(){
   const all=D.baskets.find(b=>b.id==='all'),cats=D.baskets.filter(b=>b.id!=='all');
-  return `<h1>ポケモンカード(日本語版)PSA10 eBay 価格指数</h1>
-  <div class="meta" style="margin-bottom:12px">データ日付 ${D.date} ／ 更新 ${jst(D.generated_at)}(日本時間) ／ 為替 1ドル=${D.usd_jpy.toFixed(2)}円 ／ 対象 ${all.n_cards}銘柄</div>
-  ${basketBlock(all,'指数は、各カードの価格の変化を、同じ重みで平均した値です(高額なカードだけに、偏りません)。実際の価格の平均や合計は、参考として併記しています。各カードの価格は、eBay の出品情報をもとに、毎日1回算出しています(算出方法は「指数の算出方法」をご覧ください)。')}
-  <h2>カテゴリ</h2>
-  <div class="grid">${cats.map(c=>c.reference?`<a class="panel cat" href="#/category/${c.id}"><div class="n">${c.name}</div><div class="meta">${c.description}</div>
-    <div style="display:flex;justify-content:flex-end;align-items:baseline;margin-top:8px"><div class="meta">${c.n_cards}枚</div></div></a>`:`<a class="panel cat" href="#/category/${c.id}"><div class="n">${c.name}</div><div class="meta">${c.description}</div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><div><span class="meta">指数</span> <span style="font-size:22px;font-weight:700">${c.index.toFixed(2)}</span> <span class="${cls(c.change['1d'])}">${pctTxt(c.change['1d'])}</span></div><div class="meta">${c.n_cards}枚 ／ 平均 ${usd(c.mean_usd)}</div></div></a>`).join('')}</div>
-  ${movers()}
-  <div class="meta" style="margin-top:6px">※ ランキングは、通常の値動きのカードだけが対象です(データ不足や保留中のカードは除きます)。</div>
-  ${illustIndex()}
+  const mv=moverCols(Object.keys(D.cards),5);
+  return `<div class="softhero"><h1>ポケカPSA10の相場が、ひと目でわかる</h1>
+  <p style="margin:0 0 12px">旧裏からサン＆ムーンまで、ポケモンカードの値段の動きを、毎日やさしく見られます。<span class="meta">データ ${D.date} ／ 更新 ${jst(D.generated_at)}(日本時間) ／ 為替 1ドル=${D.usd_jpy.toFixed(2)}円 ／ 対象 ${all.n_cards}銘柄</span></p></div>
+  ${basketBlock(all,'指数は、各カードの価格の変化を、同じ重みで平均した値です(高額なカードだけに、偏りません)。各カードの価格は、eBay の出品情報をもとに、毎日1回算出しています。')}
+  <h2 class="ribbon" id="series">シリーズから探す</h2><div style="margin-top:14px">${seriesTiles(cats)}</div>
+  <h2 class="ribbon">最近の動き</h2>
+  <div class="two" style="margin-top:14px">${moverList(mv.up,'上がったカード','上がったカードは、まだありません。')}${moverList(mv.dn,'下がったカード','下がったカードは、まだありません。')}</div>
+  <div class="meta" style="margin-top:8px">※ 通常の値動きのカードだけが対象です(データ不足や保留中のカードは除きます)。</div>
+  <h2 class="ribbon" id="illust">イラストレーターから探す(A-Z)</h2><div style="margin-top:14px">${azIndex()}</div>
   ${ebayCta()}`;
 }
-function illustIndex(){
-  const cnt={};Object.values(D.cards).forEach(c=>illusNames(c).forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
-  const names=Object.keys(cnt).sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase(),'en'));
-  if(!names.length)return '';
-  return `<h2>イラストレーター別カードの一覧(A-Z順)</h2><div class="panel" style="line-height:2.3">${names.map(n=>`<a href="#/illust/${encodeURIComponent(n)}" style="display:inline-block;padding:2px 10px;margin:2px 4px 2px 0;border:1px solid #d8dde6;border-radius:14px;background:#fff;line-height:1.7">${n.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))} <span class="meta">${cnt[n]}</span></a>`).join('')}</div>
-  <div class="meta" style="margin-top:6px">※ カードに印刷されているイラストレーター名を、カード画像から読み取っています(読み取れたカードだけ)。</div>`;
+function pageIllustIndex(){
+  return `${crumbs([['TOP',P.top()],['イラストレーター',null]])}<h1>イラストレーター別の一覧</h1><p>名前をえらぶと、その人が描いたカードの一覧と、PSA10の相場が見られます。</p>${azIndex()}`;
 }
+function illustFromRoute(r){return r.name||ILLUS[r.slug]||null}
 function pageIllust(name){
+  if(!name)return pageNotFound();
   const ids=Object.keys(D.cards).filter(id=>illusNames(D.cards[id]).includes(name));
-  const who=COMPANY.test(name)?name:name+'先生';
-  if(!ids.length)return `<div class="crumb"><a href="#/">TOP</a> › イラストレーター</div><h1>${who}のカード一覧</h1><div class="panel empty">該当するカードがありません。</div>`;
+  const w=who(name);
+  if(!ids.length)return pageNotFound();
   const groups={};ids.forEach(id=>{const g=D.cards[id].sr==null?99:D.cards[id].sr;(groups[g]=groups[g]||[]).push(id)});
-  return `<div class="crumb"><a href="#/">TOP</a> › イラストレーター</div><h1>${who.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}のカード一覧</h1>
-  <div class="meta" style="margin-bottom:12px">${ids.length}枚 ／ 旧裏から順に並んでいます</div>
-  ${Object.keys(groups).map(Number).sort((a,b)=>a-b).map(g=>`<h2>${SR_NAME[g]||'その他'}</h2><div class="panel">${cardTable(groups[g],true)}</div>`).join('')}`;
+  const co=illustCounts(ids);delete co[name];
+  const mates=Object.keys(co).sort((a,b)=>co[b]-co[a]).slice(0,8);
+  const by=(a,b)=>String(D.cards[a].set).localeCompare(String(D.cards[b].set))||String(D.cards[a].number).localeCompare(String(D.cards[b].number));
+  return `${crumbs([['TOP',P.top()],['イラストレーター',P.illustIndex()],[name,null]])}<h1>${esc(w)}のカード一覧</h1>
+  <p class="meta" style="margin-bottom:12px">${ids.length}枚 ／ 旧裏から順に並んでいます</p>
+  ${Object.keys(groups).map(Number).sort((a,b)=>a-b).map(g=>`<h2 class="ribbon">${SR_NAME[g]||'その他'}</h2><div style="margin-top:14px"><div class="card-grid">${groups[g].sort(by).map(id=>tile(id,D.cards[id],{showIllus:false})).join('')}</div></div>`).join('')}
+  ${mates.length?`<h2 class="ribbon">同じカードを描いたイラストレーター</h2><div class="panel" style="margin-top:14px"><div style="display:flex;flex-wrap:wrap;gap:8px">${mates.map(n=>`<a class="chipl" href="${P.illust(n)}">${esc(n)}</a>`).join('')}</div></div>`:''}
+  <p style="margin-top:24px"><a class="btn" href="${P.illustIndex()}">イラストレーターの一覧へ</a></p>`;
 }
-function pageCat(id){
-  const b=D.baskets.find(x=>x.id===id);if(!b)return '<p>not found</p>';
-  return `<div class="crumb"><a href="#/">TOP</a> › カテゴリ</div><h1>${b.name}</h1><div class="meta" style="margin-bottom:12px">${b.description} ／ ${b.n_cards}銘柄</div>
-  ${b.reference?`<div class="panel" style="margin-bottom:12px"><div class="meta">取得件数が少ないため、あくまでも参考としてください。この一覧のカードは、指数の算出には使っていません。</div></div>`:basketBlock(b,'指数は、カテゴリ内の各カードの価格の変化を、同じ重みで平均した値です。実際の価格の平均や合計は、参考として併記しています。')}
-  <h2>対象カード</h2><div class="panel">${cardTable(b.card_ids)}</div>${ebayCta()}`;
+function pageSeries(id){
+  const b=D.baskets.find(x=>x.id===id);if(!b)return pageNotFound();
+  const ids=b.card_ids.filter(i=>D.cards[i]);
+  const mv=b.reference?{up:[],dn:[]}:moverCols(ids,5);
+  const co=illustCounts(ids);const top=Object.keys(co).sort((a,b)=>co[b]-co[a]).slice(0,8);
+  const others=D.baskets.filter(x=>x.id!==id&&x.id!=='all');
+  return `${crumbs([['TOP',P.top()],[b.name,null]])}<h1>${esc(b.name)}のPSA10相場</h1>
+  <div class="meta" style="margin-bottom:12px">${esc(b.description)} ／ ${b.n_cards}銘柄</div>
+  ${b.reference?`<div class="panel" style="margin-bottom:12px"><div class="meta">取得件数が少ないため、あくまでも参考としてください。この一覧のカードは、指数の算出には使っていません。</div></div>`:basketBlock(b,'指数は、カテゴリ内の各カードの価格の変化を、同じ重みで平均した値です。')}
+  <h2 class="ribbon">対象カード</h2><div style="margin-top:14px">${cardGrid(ids,{limit:1})}</div>
+  ${b.reference?'':`<h2 class="ribbon">${esc(b.name)}の、最近の動き</h2><div class="two" style="margin-top:14px">${moverList(mv.up,'上がったカード','上がったカードは、まだありません。')}${moverList(mv.dn,'下がったカード','下がったカードは、まだありません。')}</div>`}
+  ${top.length?`<h2 class="ribbon">${esc(b.name)}で多くのカードを描いた人</h2><div class="panel" style="margin-top:14px"><div style="display:flex;flex-wrap:wrap;gap:8px">${top.map(n=>`<a class="chipl" href="${P.illust(n)}">${esc(n)}<small>${co[n]}</small></a>`).join('')}</div></div>`:''}
+  <h2 class="ribbon">ほかのシリーズ</h2><div style="margin-top:14px">${seriesTiles(others)}</div>`;
+}
+function relatedCards(id,c){
+  const same=Object.keys(D.cards).filter(k=>k!==id&&D.cards[k].set===c.set&&!D.cards[k].dup_of);
+  const num=k=>parseInt(String(D.cards[k].number).split('/')[0],10)||0,mine=num(id);
+  const near=same.filter(k=>num(k)).sort((a,b)=>Math.abs(num(a)-mine)-Math.abs(num(b)-mine)).slice(0,6);
+  const names=illusNames(c);
+  let byIllus=[];
+  if(names[0])byIllus=Object.keys(D.cards).filter(k=>k!==id&&illusNames(D.cards[k]).includes(names[0])&&!D.cards[k].dup_of).sort((a,b)=>(D.cards[b].price_usd||0)-(D.cards[a].price_usd||0)).slice(0,6);
+  const b=D.baskets.find(x=>x.card_ids.includes(id)&&x.id.startsWith('sr-'))||D.baskets.find(x=>x.card_ids.includes(id)&&!['all','total','ref'].includes(x.id));
+  let risers=[];
+  if(b)risers=moverCols(b.card_ids.filter(k=>k!==id&&D.cards[k]),6).up;
+  return{near,byIllus,names,b,risers};
 }
 function pageCard(id){
-  const c=D.cards[id];if(!c)return '<p>not found</p>';
-  const b=D.baskets.find(x=>x.id!=='all'&&x.card_ids.includes(id));
+  const c=D.cards[id];if(!c)return pageNotFound();
+  const rel=relatedCards(id,c);
   const lh=c.lowest_history||[];
   const cm=state.cm||(lh.length>=2?'lowest':'median');
-  const pts=sliceH(cm==='lowest'?lh:c.history).map(h=>[h[0],h[1]]);
-  const dupNote=c.dup_of&&D.cards[c.dup_of]?`<div class="panel" style="margin-top:12px"><div class="meta">この版(初版・ミラー等)は、eBay の題名から通常版と区別できないため、価格は<a href="#/card/${c.dup_of}">${D.cards[c.dup_of].name_jp}(${D.cards[c.dup_of].set})</a>と同じ検索結果です(目安)。二重に数えないよう、指数・枚数・合計額には含めていません。</div></div>`:(c.variants&&c.variants.filter(v=>D.cards[v]).length?`<div class="panel" style="margin-top:12px"><div class="meta">同じ検索結果の版違い(初版・ミラー等): ${c.variants.filter(v=>D.cards[v]).map(v=>`<a href="#/card/${v}">${D.cards[v].name_jp}(${D.cards[v].set})</a>`).join('、')}。題名から区別できないため、価格は同じです(目安)。</div></div>`:'');
-  const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
-  return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
-  <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}${c.illustrator?` ／ イラスト: ${c.illustrator}`:''}</div></div></div>
-  ${c.reference?`<div class="panel" style="margin-bottom:12px;border-color:#d9a400"><strong>参考</strong> ― 取得件数が少ないため、あくまでも参考としてください。(指数には含めていません)</div>`:''}
-  <div class="panel"><div class="hero"><div><div class="meta">最安値(PSA 10)</div><div class="big">${c.lowest_usd!=null?usd(c.lowest_usd):'—'}</div><div class="meta">${c.lowest_usd!=null?yenInfo(c.lowest_usd):'出品の最安値が、取得できませんでした'}</div><div class="meta ${cls(dodL(c))}">前日比 ${pctTxt(dodL(c))}</div></div>
-    <div><div class="meta">中央値</div><div class="big" style="font-size:28px">${usd(c.price_usd)}</div><div class="meta">${yenInfo(c.price_usd)}</div><div class="meta ${cls(dod(c))}">前日比 ${pctTxt(dod(c))}</div></div>
+  const full=cm==='lowest'?lh:priceHist(c);
+  const hs=sliceR(full);const pct=hs.length>1&&hs[0][1]?hs[hs.length-1][1]/hs[0][1]-1:null;
+  const h=priceHist(c);
+  const dupNote=c.dup_of&&D.cards[c.dup_of]?`<div class="panel" style="margin-top:16px"><div class="meta">この版(初版・ミラー等)は、eBay の題名から通常版と区別できないため、価格は<a href="${P.card(c.dup_of)}">${esc(D.cards[c.dup_of].name_jp)}(${esc(D.cards[c.dup_of].set)})</a>と同じ検索結果です(目安)。二重に数えないよう、指数・枚数・合計額には含めていません。</div></div>`:(c.variants&&c.variants.filter(v=>D.cards[v]).length?`<div class="panel" style="margin-top:16px"><div class="meta">同じ検索結果の版違い(初版・ミラー等): ${c.variants.filter(v=>D.cards[v]).map(v=>`<a href="${P.card(v)}">${esc(D.cards[v].name_jp)}(${esc(D.cards[v].set)})</a>`).join('、')}。題名から区別できないため、価格は同じです(目安)。</div></div>`:'');
+  const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:16px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
+  const crumbItems=[['TOP',P.top()]];
+  if(rel.b)crumbItems.push([rel.b.name,P.series(rel.b.id)]);
+  crumbItems.push([c.name_jp,null]);
+  return `${crumbs(crumbItems)}
+  <div class="cardhead">${c.image?`<img class="cimg" src="${esc(IMG(c.image))}" alt="${esc(c.name_jp)}" width="132" height="185" decoding="async" fetchpriority="high">`:`<span class="cbadge"><b>${esc(String(c.number).split('/')[0])}</b><i>${esc(c.set_code||'')}</i></span>`}
+    <div><h1>${esc(c.name_jp)} <span class="meta">PSA 10</span></h1>
+    <div class="meta" style="margin-bottom:10px">${esc(c.en_name)} ／ ${esc(c.set)} ／ ${esc(c.number)}</div>
+    ${illusNames(c).length?`<div style="margin-bottom:8px">イラスト: ${illusLinks(c)}</div>`:''}</div></div>
+  ${c.reference?`<div class="panel" style="margin-bottom:12px;border-color:#E3D6C2"><strong>参考</strong> ― 取得件数が少ないため、あくまでも参考としてください。(指数には含めていません)</div>`:''}
+  <div class="panel"><div class="hero"><div><div class="meta">最安値(PSA 10)</div><div class="big">${c.lowest_usd!=null?usd(c.lowest_usd):'—'}</div><div class="meta">${c.lowest_usd!=null?ud(c.lowest_usd):'出品なし'}</div></div>
+    <div><div class="meta">中央値</div><div class="big" style="font-size:28px">${usd(c.price_usd)}</div><div class="meta">${ud(c.price_usd)}</div></div>
     <div><div class="meta">使った出品</div><div class="chg">${c.n_kept==null?'—':c.n_kept+'件'}</div></div></div>
     ${flagPill(c.flag)}
-    <div class="tabs" style="margin:6px 0 8px">${[['lowest','最安値'],['median','中央値']].map(([m,t])=>`<button data-cm="${m}" class="${cm===m?'on':''}">${t}</button>`).join('')}</div>
-    ${c.history.length>30?rangeTabs():''}
-    ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'),v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
-    <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
+    ${headlineHtml(periodLabel(full),pct)}
+    ${chipsHtml(pctOver(h,7),pctOver(h,30),pctOver(h,90))}
+    ${areaChart(hs,{fmt:v=>'$'+Math.round(v).toLocaleString('en-US'),tipFmt:v=>usd(v),aria:`${c.name_jp}の${cm==='lowest'?'最安値':'中央値'}のグラフ。${periodLabel(full)}で${pct==null?'変化なし':pctTxt(pct)}`})}
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">${full.length>30?rangeSeg():''}<div class="seg" role="radiogroup" aria-label="どの値段">${[['lowest','最安値'],['median','中央値']].map(([m,t])=>`<button type="button" role="radio" aria-checked="${cm===m}" data-cm="${m}" class="${cm===m?'on':''}">${t}</button>`).join('')}</div></div>
+    <div style="margin-top:14px"><a class="btn primary" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="${P.guide()}">買い方ガイド</a></div>
     <div class="meta" style="margin-top:8px">価格は、1日1回の算出値です(最大約24時間古い場合があります)。出品の価格や在庫は、eBay で最新の状況をご確認ください。</div></div>
-  <div id="lst" data-id="${id}" data-ls="${c.ls==null?'':c.ls}"></div>
-  ${dupNote}${jp}`;
+  <div id="lst" data-id="${id}" data-ls="${c.ls==null?'':c.ls}" data-nosnippet></div>
+  ${dupNote}${jp}
+  <hr class="dots">
+  <div class="related">
+    ${rel.near.length?`<div><h2 class="ribbon" style="margin-top:0">同じ弾のとなりのカード</h2><div class="card-grid" style="margin-top:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${rel.near.map(k=>tile(k,D.cards[k])).join('')}</div></div>`:''}
+    ${rel.byIllus.length?`<div><h2 class="ribbon" style="margin-top:0">${esc(who(rel.names[0]))}が描いたほかのカード</h2><div class="card-grid" style="margin-top:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${rel.byIllus.map(k=>tile(k,D.cards[k],{showIllus:false})).join('')}</div><p><a href="${P.illust(rel.names[0])}">${esc(who(rel.names[0]))}のカードをすべて見る</a></p></div>`:''}
+    ${rel.risers.length?`<div><h2 class="ribbon" style="margin-top:0">${esc(rel.b.name)}で、最近上がったカード</h2><div class="card-grid" style="margin-top:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${rel.risers.map(r=>tile(r[0],r[1])).join('')}</div></div>`:''}
+    <div>${rel.b?`<a class="btn" href="${P.series(rel.b.id)}">${esc(rel.b.name)}の相場を見る</a> `:''}<a class="btn" href="${P.top()}">TOPへ戻る</a></div>
+  </div>`;
 }
+function pageNotFound(){return `${crumbs([['TOP',P.top()],['ページが見つかりません',null]])}<h1>ページが見つかりませんでした</h1><p>カードの番号が変わったのかもしれません。</p><p><a class="btn primary" href="${P.top()}">TOPへ戻る</a></p>`}
 function pageAbout(){
   return `<h1>指数の算出方法</h1><div class="panel">
   <h2 style="margin-top:0">1. 対象と価格の算出</h2><ul class="plain"><li>対象は「日本語版ポケモンカード × PSA 10」です(一部、英語版のプロモカードを例外として含みます)。</li><li>eBay(米国)の、<strong>即決・米国内発送の商品を対象に、各カードごとに絞り込み、外れ値を除外して算出</strong>します。毎日1回、更新しています。</li><li>出品が少ないカードは、前日の値を表示し、その旨を表示します。急な大きな変動は、確認のため、一時的に保留することがあります。</li></ul>
@@ -243,8 +519,7 @@ function pageAbout(){
 }
 function pageGuide(){
   const ext=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`;
-  return `<div class="crumb"><a href="#/">TOP</a> › 買い物ガイド</div>
-  <h1>日本からeBayで買い物できるの？</h1>
+  return `<h1>日本からeBayで買い物できるの？</h1>
   <p>できます。eBay(ebay.com)は日本の住所への発送に対応している出品者が多く、日本からでもアカウントを作れば購入できます。ここではカードを買うまでの流れを、簡単にまとめます。公式の案内は ${ext('https://www.ebay.co.jp/how-to-buy/','eBay 公式「購入方法」')} も確認してください。</p>
   <ol class="steps">
     <li><h3>アカウントを作る</h3>ebay.com を開き、<span class="mono">Register</span> を選びます。個人アカウントで、氏名・メールアドレス・パスワードを入力します。Google や Apple のアカウントでも登録できます。メールの確認が済めば完了です。</li>
@@ -296,64 +571,147 @@ function pageSource(){
   ${legalSec('データの出典','<p>本サイトの価格は、eBay(米国)の出品情報をもとに算出しています。eBay の Browse API から、即決価格の出品を取得しています。</p>')}
   ${legalSec('取得と更新','<ul class="plain"><li>取得頻度: 1日1回</li><li>対象: 日本語版ポケモンカード、PSA 10(一部、英語版のプロモカード)。対象は、サイトの成長に合わせて見直すことがあります。</li><li>表示している価格は、算出した値で、eBay 上の最新の価格より、最大約24時間古い場合があります。個別の出品は、表示していません。</li></ul>')}
   ${legalSec('保存するデータ','<ul class="plain"><li>保存する: カードごとの算出した価格、使った出品の件数</li><li>保存しない: 購入者・出品者の識別情報、その他の個人情報</li></ul>')}
-  ${legalSec('価格の算出','<p>詳しくは、<a href="#/about">指数の算出方法</a>をご覧ください。</p>')}
+  ${legalSec('価格の算出','<p>詳しくは、<a href="${P.about()}">指数の算出方法</a>をご覧ください。</p>')}
   ${legalSec('為替','<p>円への換算は、欧州中央銀行(ECB)が公表する参照レートを使った目安です。</p>')}
   ${legalSec('日本の相場について','<p>日本の相場を表示する場合は、「日本相場(参考:スニーカーダンク)」と出典を明記します。</p>')}
   ${legalSec('eBay について','<p>eBay は eBay Inc. の商標です。本サイトは、eBay Inc. とは無関係の非公式サイトです。</p>')}
   </div>`;
 }
-// ---------- router ----------
-let route=location.hash.replace(/^#\/?/,'');
-function render(){
-  const h=route.split('/'),app=el('app');
-  if(typeof pop!=='undefined')pop.hidden=true;
-  if(!D){app.innerHTML='<div class="panel">データを読み込めませんでした。時間をおいて、再読み込みしてください。</div>';return}
-  app.innerHTML=h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='illust'?pageIllust(decodeURIComponent(h[1]||'')):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():h[0]==='privacy'?pagePrivacy():h[0]==='terms'?pageTerms():h[0]==='source'?pageSource():pageTop();
-  window.scrollTo(0,0);
-  track('page_view',{page_title:document.title,page_location:location.href.split('#')[0]+'#/'+route,page_path:'/'+route});
+// ---------- SEO (title / description / canonical / breadcrumbs); the server writes the same into the HTML for crawlers ----------
+function setMeta(m){
+  document.title=m.title;
+  const set=(sel,attr,val)=>{let e=document.head.querySelector(sel);if(!e){e=document.createElement(sel.startsWith('link')?'link':'meta');const k=sel.match(/\[(\w+)="([^"]+)"\]/);if(k)e.setAttribute(k[1],k[2]);document.head.appendChild(e)}e.setAttribute(attr,val)};
+  set('meta[name="description"]','content',m.desc);
+  set('meta[name="robots"]','content',(SERVER&&!window.PSA_NOINDEX)?(m.robots||'index,follow'):'noindex,nofollow');
+  if(m.canonical)set('link[rel="canonical"]','href',m.canonical);
+  set('meta[property="og:title"]','content',m.title);set('meta[property="og:description"]','content',m.desc);
+  let ld=document.getElementById('ld-bc');
+  if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='ld-bc';document.head.appendChild(ld)}
+  ld.textContent=m.crumbs?JSON.stringify({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:m.crumbs.map((c,i)=>Object.assign({'@type':'ListItem',position:i+1,name:c[0]},c[1]?{item:c[1]}:{}))}):'';
 }
-const pop=document.createElement('div');pop.className='pop';pop.hidden=true;document.body.appendChild(pop);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')pop.hidden=true});
-document.addEventListener('click',e=>{
-  const eb=e.target.closest('a[href*="ebay."]');if(eb)track('ebay_click',{link_url:eb.href,from_page:route});
-  const ib=e.target.closest('.info');
-  if(ib){e.preventDefault();e.stopPropagation();const show=pop.hidden||pop.dataset.for!==String([...document.querySelectorAll('.info')].indexOf(ib));
-    if(!show){pop.hidden=true;return}
-    pop.innerHTML=fxText();pop.dataset.for=String([...document.querySelectorAll('.info')].indexOf(ib));pop.hidden=false;
-    const r=ib.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(r.left-8,innerWidth-pop.offsetWidth-8))+'px';pop.style.top=(r.bottom+8)+'px';return}
-  pop.hidden=true;
-  const a=e.target.closest('a[href^="#/"]');
-  if(a){e.preventDefault();route=a.getAttribute('href').slice(2);try{history.replaceState(null,'',a.getAttribute('href'))}catch(x){}render();return}
-  const b=e.target.closest('.tabs button');
-  if(b){if(b.dataset.r!==undefined)state.range=+b.dataset.r;if(b.dataset.m)state.metric=b.dataset.m;if(b.dataset.cm)state.cm=b.dataset.cm;const y=scrollY;render();scrollTo(0,y)}
-});
-window.addEventListener('hashchange',()=>{route=location.hash.replace(/^#\/?/,'');render()});
-// eBay listings behind the price (eBay content: fetched from a single-commit branch that is replaced every day)
-const LST_BASE='https://raw.githubusercontent.com/yufuta/psa-pokecard-index/listings/';
+function metaFor(r){
+  const day=D.date,all=D.baskets.find(b=>b.id==='all');
+  const abs=p=>ABS(p);
+  if(r.page==='top'){const p=pctOver(all.history.map(x=>[x.date,x.index]),30);return{title:'ポケカ相場指数｜PSA10の価格推移を毎日更新 - '+SITE_NAME,desc:`旧裏からサン＆ムーンまで、ポケモンカード(PSA10)の相場を指数とグラフで毎日更新。${p==null?'':'この1か月のポケカ総合指数は'+pctTxt(p)+'。'}シリーズ別・カード別・イラストレーター別に見られます。`,canonical:abs(P.top())}}
+  if(r.page==='series'){const b=D.baskets.find(x=>x.id===r.id);if(!b)return{title:'ページが見つかりません - '+SITE_NAME,desc:'',robots:'noindex'};const p=b.change&&b.change['30d'];return{title:`${b.name}ポケカのPSA10相場・価格推移｜${b.n_cards}枚の指数`,desc:`${b.name}のポケモンカード${b.n_cards}枚のPSA10相場を毎日更新。${p==null?'':'この1か月で'+pctTxt(p)+'。'}上がったカード・下がったカード、カードごとの価格推移が見られます。(${day}更新)`,robots:b.reference?'noindex,follow':'index,follow',canonical:abs(P.series(b.id)),crumbs:[[SITE_NAME,abs(P.top())],[b.name,null]]}}
+  if(r.page==='card'){const c=D.cards[r.id];if(!c)return{title:'ページが見つかりません - '+SITE_NAME,desc:'',robots:'noindex'};const p=pctBest(priceHist(c)).r;const il=illusNames(c)[0];
+    const b=relatedCards(r.id,c).b;const thin=c.reference&&histDays(priceHist(c))<14;
+    return{title:`${c.name_jp}(${c.set} ${c.number}) PSA10の価格推移・相場`,desc:`${c.name_jp}(${c.set}・${c.number}${il?'・イラスト '+il:''})のPSA10の価格を毎日記録。いまの出品価格は${usd(c.price_usd)}(${man(c.price_usd)})${p==null?'':'、この1か月で'+pctTxt(p)}。グラフで値動きを確認できます。`,robots:(c.dup_of||thin)?'noindex,follow':'index,follow',canonical:abs(P.card(c.dup_of&&D.cards[c.dup_of]?c.dup_of:r.id)),crumbs:[[SITE_NAME,abs(P.top())]].concat(b?[[b.name,abs(P.series(b.id))]]:[]).concat([[c.name_jp,null]])}}
+  if(r.page==='illust'){const n=illustFromRoute(r);if(!n)return{title:'ページが見つかりません - '+SITE_NAME,desc:'',robots:'noindex'};const cnt=Object.keys(D.cards).filter(id=>illusNames(D.cards[id]).includes(n)).length;
+    return{title:`${who(n)}のポケモンカード一覧｜PSA10の相場`,desc:`イラストレーター${n}さんが描いたポケモンカード${cnt}枚の一覧。旧裏からサン＆ムーンまで、シリーズ順にPSA10の価格と値動きをまとめています。`,canonical:abs(P.illust(n)),crumbs:[[SITE_NAME,abs(P.top())],['イラストレーター',abs(P.illustIndex())],[n,null]]}}
+  if(r.page==='illustIndex')return{title:`ポケモンカードのイラストレーター一覧(A-Z)｜${SITE_NAME}`,desc:`ポケモンカードのイラストレーター${Object.keys(illustCounts()).length}人を、A-Z順に一覧にしました。名前をえらぶと、その人が描いたカードとPSA10の相場が見られます。`,canonical:abs(P.illustIndex()),crumbs:[[SITE_NAME,abs(P.top())],['イラストレーター',null]]};
+  const st={guide:['ポケカの買い方ガイド｜日本からeBayで買うには？','日本からeBayでポケモンカードを買う手順を、はじめての人向けにやさしく説明します。'],about:['指数の算出方法｜PSAポケカ指数','PSA10の指数と価格を、どうやって計算しているかの説明です。'],privacy:['プライバシーポリシー｜'+SITE_NAME,'本サイトのプライバシーポリシーです。'],terms:['利用規約・免責事項｜'+SITE_NAME,'本サイトの利用規約と免責事項です。'],source:['データの出典｜'+SITE_NAME,'本サイトの価格データの出典と、取得・更新の方法です。']};
+  if(st[r.page])return{title:st[r.page][0],desc:st[r.page][1],canonical:abs(P[r.page]()),crumbs:[[SITE_NAME,abs(P.top())],[st[r.page][0].split('｜')[0],null]]};
+  return{title:'ページが見つかりません - '+SITE_NAME,desc:'',robots:'noindex'};
+}
+// ---------- footer ----------
+function footerHtml(){
+  const cats=D.baskets.filter(b=>b.id.startsWith('sr-'));
+  return `<div class="fcols">
+    <div><h3>シリーズ</h3><ul>${cats.map(b=>`<li><a href="${P.series(b.id)}">${esc(b.name)}</a></li>`).join('')}<li><a href="${P.series('total')}">ポケカ総合</a></li></ul></div>
+    <div><h3>さがす</h3><ul><li><a href="${P.illustIndex()}">イラストレーター(A-Z)</a></li><li><a href="${P.guide()}">日本からeBayで買うには</a></li></ul></div>
+    <div><h3>このサイトについて</h3><ul><li><a href="${P.about()}">指数の算出方法</a></li><li><a href="${P.source()}">データの出典</a></li><li><a href="${P.terms()}">利用規約・免責</a></li><li><a href="${P.privacy()}">プライバシーポリシー</a></li></ul></div></div>
+  <div>価格データの出典: eBay(出品情報)。本サイトは eBay Inc. とは無関係の非公式サイトです。投資助言ではありません。</div>
+  <div style="margin-top:8px">このサイトは、米国 eBay の出品価格(PSA 10)をもとに毎日計算しています。実際の取引価格や将来の値動きを示すものではなく、売買をすすめるものでもありません。</div>`;
+}
+// ---------- eBay listings behind the price (card pages) ----------
+const LST_BASE=window.PSA_LISTINGS_BASE||'https://raw.githubusercontent.com/yufuta/psa-pokecard-index/listings/';
 const LST_CACHE={};
 const jstTime=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})};
-const escH=t=>String(t==null?'':t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 async function loadListings(){
   const box=document.getElementById('lst');if(!box||!box.dataset.ls)return;
   const id=box.dataset.id,n=box.dataset.ls,c=D.cards[id];
-  box.innerHTML='<div class="panel" style="margin-top:12px"><div class="meta">eBay の出品を読み込み中…</div></div>';
+  const wrap=h=>`<div class="ebaybox" data-nosnippet><strong>eBay の出品(価格に使っているもの)</strong>${h}</div>`;
+  box.innerHTML=wrap('<div class="skel" style="margin-top:10px"></div>');
   try{
     if(!LST_CACHE[n])LST_CACHE[n]=fetch(LST_BASE+'l'+n+'.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
     const d=await LST_CACHE[n];
     if(document.getElementById('lst')!==box)return;
     const rows=(d.c||{})[id];
-    if(!rows||!rows.length){box.innerHTML='<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品</strong><div class="meta" style="margin-top:6px">この日は取得していません(または、使える出品がありません)。</div></div>';return}
+    if(!rows||!rows.length){box.innerHTML=wrap('<div class="meta" style="margin-top:6px">この日は取得していません(または、使える出品がありません)。</div>');return}
     const tr=rows.map(r=>{const [rank,price,ship,title,loc,img,lid,used]=r;
       const link=lid?epn('https://www.ebay.com/itm/'+lid,id):null;
-      const th=img?`<img src="${escH(img)}" alt="" loading="lazy" style="width:64px;height:64px;object-fit:contain;border-radius:6px;background:#fff" referrerpolicy="no-referrer">`:'';
-      return `<tr style="${used?'':'opacity:.6'}"><td>${rank}${used?'':''}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${th}</a>`:th}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${escH(title)}</a>`:escH(title)}${used?'':' <span class="meta">(価格には使っていません)</span>'}</td><td class="r">$${price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="r">${ship?'$'+ship.toFixed(2):'無料'}</td><td>${escH(loc||'—')}</td></tr>`}).join('');
-    box.innerHTML=`<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品(安い順)</strong>
-      <div class="meta" style="margin:4px 0 8px">eBay の出品情報です(${jstTime(d.t)} 取得。最大約24時間古い場合があります。価格・在庫は、eBay で最新をご確認ください)。指数の算出に使うのは、安い方5件です。</div>
+      const th=img?`<img src="${esc(img)}" alt="" width="64" height="64" loading="lazy" style="object-fit:contain;border-radius:6px;background:#fff" referrerpolicy="no-referrer">`:'';
+      return `<tr style="${used?'':'opacity:.6'}"><td>${rank}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${th}</a>`:th}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${esc(title)}</a>`:esc(title)}${used?'':' <span class="meta">(価格には使っていません)</span>'}</td><td class="r">$${price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="r">${ship?'$'+ship.toFixed(2):'無料'}</td><td>${esc(loc||'—')}</td></tr>`}).join('');
+    box.innerHTML=wrap(`<div class="meta" style="margin:4px 0 8px">取得: ${jstTime(d.t)}(最大約24時間古い場合があります。価格・在庫は、eBay で最新をご確認ください)。指数の価格に使うのは、安い方5件です。</div>
       <div style="overflow-x:auto"><table><thead><tr><th>順位</th><th>画像</th><th>商品名</th><th class="r">価格</th><th class="r">送料</th><th>Located in</th></tr></thead><tbody>${tr}</tbody></table></div>
-      <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay の出品一覧を確認する ↗</a></div></div>`;
-  }catch(e){box.innerHTML='<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品</strong><div class="meta" style="margin-top:6px">出品の一覧を読み込めませんでした。</div></div>'}
+      <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay の出品一覧を確認する ↗</a></div>`);
+  }catch(e){box.innerHTML=wrap('<div class="meta" style="margin-top:6px">出品の一覧を読み込めませんでした。</div>')}
 }
-const _render=render;render=function(){_render();if(route.split('/')[0]==='card')loadListings()};
+// ---------- router ----------
+const STATIC_PAGES={about:['指数の算出方法',pageAbout],guide:['つかいかた',pageGuide],privacy:['プライバシーポリシー',pagePrivacy],terms:['利用規約・免責事項',pageTerms],source:['データの出典',pageSource]};
+function render(keepScroll){
+  const r=parseRoute(),app=el('app');
+  if(typeof pop!=='undefined')pop.hidden=true;
+  if(!D){app.innerHTML='<div class="panel">データを読み込めませんでした。時間をおいて、再読み込みしてください。</div>';return}
+  CHARTS.length=0;
+  let html;
+  if(r.page==='top')html=pageTop();
+  else if(r.page==='series')html=pageSeries(r.id);
+  else if(r.page==='card')html=pageCard(r.id);
+  else if(r.page==='illust')html=pageIllust(illustFromRoute(r));
+  else if(r.page==='illustIndex')html=pageIllustIndex();
+  else if(STATIC_PAGES[r.page])html=crumbs([['TOP',P.top()],[STATIC_PAGES[r.page][0],null]])+STATIC_PAGES[r.page][1]();
+  else html=pageNotFound();
+  app.innerHTML=html;
+  el('foot').innerHTML=footerHtml();
+  setMeta(metaFor(r));
+  CHARTS.forEach(f=>f());
+  if(r.page==='card')loadListings();
+  if(!keepScroll)window.scrollTo(0,r.anchor?0:0);
+  if(r.anchor){const t=document.getElementById(r.anchor);if(t)t.scrollIntoView()}
+  track('page_view',{page_title:document.title,page_location:location.href,page_path:SERVER?location.pathname:'/'+location.hash.replace(/^#\/?/,'')});
+}
+function go(href){
+  if(SERVER){history.pushState(null,'',href);render()}
+  else{location.hash=href.replace(/^#/,'')}
+}
+const pop=document.createElement('div');pop.className='pop';pop.hidden=true;document.body.appendChild(pop);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')pop.hidden=true});
+document.addEventListener('click',e=>{
+  const eb=e.target.closest('a[href*="ebay."]');if(eb)track('ebay_click',{link_url:eb.href,from_page:location.pathname+location.hash});
+  const ib=e.target.closest('.info');
+  if(ib){e.preventDefault();e.stopPropagation();const idx=String([...document.querySelectorAll('.info')].indexOf(ib)),show=pop.hidden||pop.dataset.for!==idx;
+    if(!show){pop.hidden=true;return}
+    pop.innerHTML=fxText();pop.dataset.for=idx;pop.hidden=false;
+    const r=ib.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(r.left-8,innerWidth-pop.offsetWidth-8))+'px';pop.style.top=(r.bottom+8)+'px';return}
+  pop.hidden=true;
+  const nav=e.target.closest('[data-nav]');
+  if(nav){e.preventDefault();const k=nav.dataset.nav;if(k==='guide')go(P.guide());else{go(P.top());setTimeout(()=>{const t=document.getElementById(k==='series'?'series':'illust');if(t)t.scrollIntoView()},30)}return}
+  if(e.target.closest('[data-home]')){e.preventDefault();go(P.top());return}
+  const a=e.target.closest('a[href]');
+  if(a&&!e.defaultPrevented&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&a.target!=='_blank'){
+    const h=a.getAttribute('href');
+    if(SERVER?(h.startsWith('/')&&!h.startsWith('//')):h.startsWith('#/')){e.preventDefault();go(h);return}
+  }
+  const b=e.target.closest('button[data-r],button[data-m],button[data-cm],button[data-sort],button[data-more]');
+  if(b){
+    if(b.dataset.r!==undefined)state.range=+b.dataset.r;
+    if(b.dataset.m)state.metric=b.dataset.m;
+    if(b.dataset.cm)state.cm=b.dataset.cm;
+    if(b.dataset.sort)state.sort=b.dataset.sort;
+    if(b.dataset.more)state.shown+=60;
+    const y=scrollY;render(true);scrollTo(0,y);
+  }
+});
+window.addEventListener(SERVER?'popstate':'hashchange',()=>render());
+// back to top
+const totop=el('totop');
+const onScroll=()=>totop.classList.toggle('show',scrollY>400);
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+totop.addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));
+// header links (real URLs in the server version)
+document.querySelectorAll('header a[data-home]').forEach(a=>a.setAttribute('href',P.top()));
+document.querySelector('header a[data-nav="series"]').setAttribute('href',P.top()+(SERVER?'#series':''));
+document.querySelector('header a[data-nav="illust"]').setAttribute('href',P.illustIndex());
+document.querySelector('header a[data-nav="guide"]').setAttribute('href',P.guide());
+document.querySelector('header a[data-nav="illust"]').removeAttribute('data-nav');
+// old hash URLs (links shared before the server version) -> real URLs
+if(SERVER&&location.hash.startsWith('#/')){
+  const h=location.hash.slice(2).split('/');let to=null;
+  if(h[0]==='card'&&h[1])to=P.card(h[1]);else if(h[0]==='category'&&h[1])to=P.series(h[1]);else if(h[0]==='illust'&&h[1])to=P.illust(decodeURIComponent(h[1]));else if(['guide','about','privacy','terms','source'].includes(h[0]))to=P[h[0]]();
+  if(to)history.replaceState(null,'',to);
+}
 render();
 </script>
 </body>
