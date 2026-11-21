@@ -196,6 +196,7 @@ function pageCard(id){
   const lh=c.lowest_history||[];
   const cm=state.cm||(lh.length>=2?'lowest':'median');
   const pts=sliceH(cm==='lowest'?lh:c.history).map(h=>[h[0],h[1]]);
+  const dupNote=c.dup_of&&D.cards[c.dup_of]?`<div class="panel" style="margin-top:12px"><div class="meta">この版(初版・ミラー等)は、eBay の題名から通常版と区別できないため、価格は<a href="#/card/${c.dup_of}">${D.cards[c.dup_of].name_jp}(${D.cards[c.dup_of].set})</a>と同じ検索結果です(目安)。二重に数えないよう、指数・枚数・合計額には含めていません。</div></div>`:(c.variants&&c.variants.length?`<div class="panel" style="margin-top:12px"><div class="meta">同じ検索結果の版違い(初版・ミラー等): ${c.variants.filter(v=>D.cards[v]).map(v=>`<a href="#/card/${v}">${D.cards[v].name_jp}(${D.cards[v].set})</a>`).join('、')}。題名から区別できないため、価格は同じです(目安)。</div></div>`:'');
   const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
   return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
   <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}${c.illustrator?` ／ イラスト: ${c.illustrator}`:''}</div></div></div>
@@ -209,7 +210,7 @@ function pageCard(id){
     ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'),v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
     <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
     <div class="meta" style="margin-top:8px">価格は、1日1回の算出値です(最大約24時間古い場合があります)。出品の価格や在庫は、eBay で最新の状況をご確認ください。</div></div>
-  ${jp}`;
+  ${dupNote}${jp}`;
 }
 function pageAbout(){
   return `<h1>指数の算出方法</h1><div class="panel">
