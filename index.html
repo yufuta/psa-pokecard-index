@@ -158,14 +158,19 @@ function thumb(c,size){
   if(c.image) return `<img class="cimg ${size}" src="${c.image}" alt="${c.name_jp}" loading="lazy">`;
   return `<span class="cbadge ${size}"><b>${c.number.split('/')[0]}</b><i>${c.set_code||(c.number.split('/')[1]||'')}</i></span>`;
 }
-function cardTable(ids){
-  const rows=ids.map(id=>[id,D.cards[id]]).sort((a,b)=>(b[1].price_usd||0)-(a[1].price_usd||0));
-  return `<table><thead><tr><th>カード</th><th class="r">最安値(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}</div></div></td><td class="r">${c.lowest_usd!=null?ud(c.lowest_usd):'—'}<div class="meta">中央値 ${usd(c.price_usd)}</div></td><td class="r ${cls(dodL(c))}">${pctTxt(dodL(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
+const COMPANY=/Graphics|gangs|Art-team|Project/i;
+const SR_NAME=['旧裏','カードe','ADV','PCG','DP','DPt','LEGEND','BW','XY','サン＆ムーン'];
+function illusNames(c){return (c.illustrator||'').split(' / ').map(x=>x.trim()).filter(x=>x&&!/^Direc\.?/i.test(x))}
+function illusLinks(c){return illusNames(c).map(n=>`<a href="#/illust/${encodeURIComponent(n)}">${n.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}</a>`).join(' / ')}
+const illusLine=c=>illusNames(c).length?`<div class="meta">Illus.${illusLinks(c)}</div>`:'';
+function cardTable(ids,ordered){
+  const rows=ids.map(id=>[id,D.cards[id]]).sort(ordered?((a,b)=>String(a[1].set).localeCompare(String(b[1].set))||String(a[1].number).localeCompare(String(b[1].number))):((a,b)=>(b[1].price_usd||0)-(a[1].price_usd||0)));
+  return `<table><thead><tr><th>カード</th><th class="r">最安値(PSA 10)</th><th class="r">前日比</th><th class="r">使った出品</th></tr></thead><tbody>${rows.map(([id,c])=>`<tr><td><div class="nm">${thumb(c,"s")}<div><a href="#/card/${id}">${c.name_jp}</a> <span class="meta">${c.number}</span> ${flagPill(c.flag)}${illusLine(c)}</div></div></td><td class="r">${c.lowest_usd!=null?ud(c.lowest_usd):'—'}<div class="meta">中央値 ${usd(c.price_usd)}</div></td><td class="r ${cls(dodL(c))}">${pctTxt(dodL(c))}</td><td class="r">${c.n_kept==null?'—':c.n_kept+'件'}</td></tr>`).join('')}</tbody></table>`;
 }
 function movers(){
   const rows=Object.entries(D.cards).filter(([,c])=>c.flag==='ok'&&dod(c)!=null).map(([id,c])=>[id,c,dod(c)]).sort((a,b)=>b[2]-a[2]);
   if(!rows.length) return `<h2>前日から動いたカード</h2><div class="panel empty">前日比は、2日分のデータがそろった翌日から表示されます。</div>`;
-  const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><div class="nm">${thumb(c,"xs")}<a href="#/card/${id}">${c.name_jp}</a></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
+  const t=rows=>`<table><thead><tr><th>カード</th><th class="r">価格</th><th class="r">前日比</th></tr></thead><tbody>${rows.map(([id,c,r])=>`<tr><td><div class="nm">${thumb(c,"xs")}<div><a href="#/card/${id}">${c.name_jp}</a>${illusLine(c)}</div></div></td><td class="r">${ud(c.price_usd)}</td><td class="r ${cls(r)}">${pctTxt(r)}</td></tr>`).join('')}</tbody></table>`;
   return `<div class="two"><div><h2>前日から上がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]>0).slice(0,10))}</div></div><div><h2>前日から下がったカード TOP10</h2><div class="panel">${t(rows.filter(r=>r[2]<0).slice(-10).reverse())}</div></div></div>`;
 }
 function ebayCta(){return `<h2>eBay で実際の出品を確認する</h2><div class="panel cta"><div>本サイトの価格は、eBay の出品情報をもとに毎日1回算出しています。各カードのページから、eBay の出品一覧へ直接移動できます。</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="#/guide">日本からの買い方ガイド</a><a class="btn" href="${epn('https://www.ebay.com/','cta')}" target="_blank" rel="${relEbay}">eBay を開く ↗</a></div></div>`}
@@ -182,7 +187,24 @@ function pageTop(){
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><div><span class="meta">指数</span> <span style="font-size:22px;font-weight:700">${c.index.toFixed(2)}</span> <span class="${cls(c.change['1d'])}">${pctTxt(c.change['1d'])}</span></div><div class="meta">${c.n_cards}枚 ／ 平均 ${usd(c.mean_usd)}</div></div></a>`).join('')}</div>
   ${movers()}
   <div class="meta" style="margin-top:6px">※ ランキングは、通常の値動きのカードだけが対象です(データ不足や保留中のカードは除きます)。</div>
+  ${illustIndex()}
   ${ebayCta()}`;
+}
+function illustIndex(){
+  const cnt={};Object.values(D.cards).forEach(c=>illusNames(c).forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
+  const names=Object.keys(cnt).sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase(),'en'));
+  if(!names.length)return '';
+  return `<h2>イラストレーター別カードの一覧(A-Z順)</h2><div class="panel" style="line-height:2.3">${names.map(n=>`<a href="#/illust/${encodeURIComponent(n)}" style="display:inline-block;padding:2px 10px;margin:2px 4px 2px 0;border:1px solid #d8dde6;border-radius:14px;background:#fff;line-height:1.7">${n.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))} <span class="meta">${cnt[n]}</span></a>`).join('')}</div>
+  <div class="meta" style="margin-top:6px">※ カードに印刷されているイラストレーター名を、カード画像から読み取っています(読み取れたカードだけ)。</div>`;
+}
+function pageIllust(name){
+  const ids=Object.keys(D.cards).filter(id=>illusNames(D.cards[id]).includes(name));
+  const who=COMPANY.test(name)?name:name+'先生';
+  if(!ids.length)return `<div class="crumb"><a href="#/">TOP</a> › イラストレーター</div><h1>${who}のカード一覧</h1><div class="panel empty">該当するカードがありません。</div>`;
+  const groups={};ids.forEach(id=>{const g=D.cards[id].sr==null?99:D.cards[id].sr;(groups[g]=groups[g]||[]).push(id)});
+  return `<div class="crumb"><a href="#/">TOP</a> › イラストレーター</div><h1>${who.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}のカード一覧</h1>
+  <div class="meta" style="margin-bottom:12px">${ids.length}枚 ／ 旧裏から順に並んでいます</div>
+  ${Object.keys(groups).map(Number).sort((a,b)=>a-b).map(g=>`<h2>${SR_NAME[g]||'その他'}</h2><div class="panel">${cardTable(groups[g],true)}</div>`).join('')}`;
 }
 function pageCat(id){
   const b=D.baskets.find(x=>x.id===id);if(!b)return '<p>not found</p>';
@@ -196,7 +218,7 @@ function pageCard(id){
   const lh=c.lowest_history||[];
   const cm=state.cm||(lh.length>=2?'lowest':'median');
   const pts=sliceH(cm==='lowest'?lh:c.history).map(h=>[h[0],h[1]]);
-  const dupNote=c.dup_of&&D.cards[c.dup_of]?`<div class="panel" style="margin-top:12px"><div class="meta">この版(初版・ミラー等)は、eBay の題名から通常版と区別できないため、価格は<a href="#/card/${c.dup_of}">${D.cards[c.dup_of].name_jp}(${D.cards[c.dup_of].set})</a>と同じ検索結果です(目安)。二重に数えないよう、指数・枚数・合計額には含めていません。</div></div>`:(c.variants&&c.variants.length?`<div class="panel" style="margin-top:12px"><div class="meta">同じ検索結果の版違い(初版・ミラー等): ${c.variants.filter(v=>D.cards[v]).map(v=>`<a href="#/card/${v}">${D.cards[v].name_jp}(${D.cards[v].set})</a>`).join('、')}。題名から区別できないため、価格は同じです(目安)。</div></div>`:'');
+  const dupNote=c.dup_of&&D.cards[c.dup_of]?`<div class="panel" style="margin-top:12px"><div class="meta">この版(初版・ミラー等)は、eBay の題名から通常版と区別できないため、価格は<a href="#/card/${c.dup_of}">${D.cards[c.dup_of].name_jp}(${D.cards[c.dup_of].set})</a>と同じ検索結果です(目安)。二重に数えないよう、指数・枚数・合計額には含めていません。</div></div>`:(c.variants&&c.variants.filter(v=>D.cards[v]).length?`<div class="panel" style="margin-top:12px"><div class="meta">同じ検索結果の版違い(初版・ミラー等): ${c.variants.filter(v=>D.cards[v]).map(v=>`<a href="#/card/${v}">${D.cards[v].name_jp}(${D.cards[v].set})</a>`).join('、')}。題名から区別できないため、価格は同じです(目安)。</div></div>`:'');
   const jp=c.jp_price_jpy!=null?`<div class="panel" style="margin-top:12px"><div class="hero"><div><div class="meta">日本相場(参考:スニーカーダンク)</div><div class="chg">¥${Math.round(c.jp_price_jpy).toLocaleString('ja-JP')}</div><div class="meta">${c.jp_price_age_days}日前に入力</div></div><div><div class="meta">日米プレミアム率</div><div class="chg ${cls(c.premium)}">${pctTxt(c.premium)}</div></div></div><div class="meta">米国価格(円換算)÷ 日本価格 − 1。送料・手数料・関税は含みません。</div></div>`:'';
   return `<div class="crumb"><a href="#/">TOP</a> › ${b?`<a href="#/category/${b.id}">${b.name}</a> › `:''}${c.name_jp}</div>
   <div class="cardhead">${thumb(c,"l")}<div><h1>${c.name_jp} <span class="meta">PSA 10</span></h1><div class="meta" style="margin-bottom:10px">${c.en_name} ／ ${c.set} ／ ${c.number}${c.illustrator?` ／ イラスト: ${c.illustrator}`:''}</div></div></div>
@@ -210,6 +232,7 @@ function pageCard(id){
     ${chart(pts,v=>'$'+Math.round(v).toLocaleString('en-US'),v=>'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))}
     <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay で出品を見る ↗</a> <a class="btn" href="#/guide">買い方ガイド</a></div>
     <div class="meta" style="margin-top:8px">価格は、1日1回の算出値です(最大約24時間古い場合があります)。出品の価格や在庫は、eBay で最新の状況をご確認ください。</div></div>
+  <div id="lst" data-id="${id}" data-ls="${c.ls==null?'':c.ls}"></div>
   ${dupNote}${jp}`;
 }
 function pageAbout(){
@@ -285,7 +308,7 @@ function render(){
   const h=route.split('/'),app=el('app');
   if(typeof pop!=='undefined')pop.hidden=true;
   if(!D){app.innerHTML='<div class="panel">データを読み込めませんでした。時間をおいて、再読み込みしてください。</div>';return}
-  app.innerHTML=h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():h[0]==='privacy'?pagePrivacy():h[0]==='terms'?pageTerms():h[0]==='source'?pageSource():pageTop();
+  app.innerHTML=h[0]==='category'?pageCat(h[1]):h[0]==='card'?pageCard(h[1]):h[0]==='illust'?pageIllust(decodeURIComponent(h[1]||'')):h[0]==='about'?pageAbout():h[0]==='guide'?pageGuide():h[0]==='privacy'?pagePrivacy():h[0]==='terms'?pageTerms():h[0]==='source'?pageSource():pageTop();
   window.scrollTo(0,0);
   track('page_view',{page_title:document.title,page_location:location.href.split('#')[0]+'#/'+route,page_path:'/'+route});
 }
@@ -305,6 +328,32 @@ document.addEventListener('click',e=>{
   if(b){if(b.dataset.r!==undefined)state.range=+b.dataset.r;if(b.dataset.m)state.metric=b.dataset.m;if(b.dataset.cm)state.cm=b.dataset.cm;const y=scrollY;render();scrollTo(0,y)}
 });
 window.addEventListener('hashchange',()=>{route=location.hash.replace(/^#\/?/,'');render()});
+// eBay listings behind the price (eBay content: fetched from a single-commit branch that is replaced every day)
+const LST_BASE='https://raw.githubusercontent.com/yufuta/psa-pokecard-index/listings/';
+const LST_CACHE={};
+const jstTime=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})};
+const escH=t=>String(t==null?'':t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+async function loadListings(){
+  const box=document.getElementById('lst');if(!box||!box.dataset.ls)return;
+  const id=box.dataset.id,n=box.dataset.ls,c=D.cards[id];
+  box.innerHTML='<div class="panel" style="margin-top:12px"><div class="meta">eBay の出品を読み込み中…</div></div>';
+  try{
+    if(!LST_CACHE[n])LST_CACHE[n]=fetch(LST_BASE+'l'+n+'.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
+    const d=await LST_CACHE[n];
+    if(document.getElementById('lst')!==box)return;
+    const rows=(d.c||{})[id];
+    if(!rows||!rows.length){box.innerHTML='<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品</strong><div class="meta" style="margin-top:6px">この日は取得していません(または、使える出品がありません)。</div></div>';return}
+    const tr=rows.map(r=>{const [rank,price,ship,title,loc,img,lid,used]=r;
+      const link=lid?epn('https://www.ebay.com/itm/'+lid,id):null;
+      const th=img?`<img src="${escH(img)}" alt="" loading="lazy" style="width:64px;height:64px;object-fit:contain;border-radius:6px;background:#fff" referrerpolicy="no-referrer">`:'';
+      return `<tr style="${used?'':'opacity:.6'}"><td>${rank}${used?'':''}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${th}</a>`:th}</td><td>${link?`<a href="${link}" target="_blank" rel="${relEbay}">${escH(title)}</a>`:escH(title)}${used?'':' <span class="meta">(価格には使っていません)</span>'}</td><td class="r">$${price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="r">${ship?'$'+ship.toFixed(2):'無料'}</td><td>${escH(loc||'—')}</td></tr>`}).join('');
+    box.innerHTML=`<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品(安い順)</strong>
+      <div class="meta" style="margin:4px 0 8px">eBay の出品情報です(${jstTime(d.t)} 取得。最大約24時間古い場合があります。価格・在庫は、eBay で最新をご確認ください)。指数の算出に使うのは、安い方5件です。</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>順位</th><th>画像</th><th>商品名</th><th class="r">価格</th><th class="r">送料</th><th>Located in</th></tr></thead><tbody>${tr}</tbody></table></div>
+      <div style="margin-top:10px"><a class="btn" href="${ebayUrl(c,id)}" target="_blank" rel="${relEbay}">eBay の出品一覧を確認する ↗</a></div></div>`;
+  }catch(e){box.innerHTML='<div class="panel" style="margin-top:12px"><strong>この価格に使っている eBay の出品</strong><div class="meta" style="margin-top:6px">出品の一覧を読み込めませんでした。</div></div>'}
+}
+const _render=render;render=function(){_render();if(route.split('/')[0]==='card')loadListings()};
 render();
 </script>
 </body>
